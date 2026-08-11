@@ -116,15 +116,32 @@ def _save_dead() -> None:
         pass
 
 
+def _norm_model(model: str) -> str:
+    """Normalize a model id for dead-list keying.
+
+    NVIDIA catalog uses bare ids (nvidia/nemotron-nano-12b-v2-vl) while
+    OpenRouter-style configs use a ':free' suffix. A model that 404s under
+    one spelling must be skipped under the other, so key on the bare stem.
+    """
+    if not model:
+        return ""
+    m = model.strip()
+    # Strip a trailing :free / :<tag> for keying only.
+    if ":" in m.split("/")[-1]:
+        m = m.rsplit(":", 1)[0]
+    return m
+
+
 def _is_dead(model: str) -> bool:
     if not model:
         return False
-    expiry = _dead.get(model)
+    key = _norm_model(model)
+    expiry = _dead.get(key)
     if expiry is None:
         return False
     if expiry < _now():
         with _lock:
-            _dead.pop(model, None)
+            _dead.pop(key, None)
             _save_dead()
         return False
     return True
@@ -132,11 +149,12 @@ def _is_dead(model: str) -> bool:
 
 def mark_unhealthy(provider: str, model: str) -> None:
     """Record that ``model`` just failed so the next resolution skips it."""
-    if not model:
+    key = _norm_model(model)
+    if not key:
         return
     with _lock:
         _load_dead()
-        _dead[model] = _now() + _DEAD_TTL
+        _dead[key] = _now() + _DEAD_TTL
         _save_dead()
 
 
