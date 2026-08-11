@@ -59,6 +59,15 @@ _TASK_TO_CATEGORY = {
     "curator": "curator",
 }
 
+# Model-id -> (provider, corrected-model-id). NVIDIA catalog does NOT use the
+# OpenRouter ":free" suffix; the bare id is what its endpoint expects. This map
+# lets apply_model_routing.py set the *correct* provider + model per task so
+# vision_analyze stops 404-ing on OpenRouter.
+_MODEL_PROVIDER_FIX = {
+    "nvidia/nemotron-nano-12b-v2-vl:free": ("nvidia", "nvidia/nemotron-nano-12b-v2-vl"),
+    "nvidia/nemotron-nano-12b-v2-vl": ("nvidia", "nvidia/nemotron-nano-12b-v2-vl"),
+}
+
 _DEAD_TTL = 30 * 60  # 30 minutes
 
 _lock = threading.Lock()

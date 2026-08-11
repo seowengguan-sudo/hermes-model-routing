@@ -4,23 +4,24 @@ apply_model_routing.py -- Deploy the daily model-selection decisions to
 Hermes runtime config.
 
 reads:  /opt/data/models_sequence.json  (written by refresh_models.py cron)
-writes: config.yaml auxiliary.<task>.model  (via `hermes config set`)
-        /opt/data/model_deadlist.json     (dead models skipped)
+        /opt/data/model_deadlist.json   (written by probe_models.py)
+writes: config.yaml auxiliary.<task>.model  (+ .provider where needed)
+        via `hermes config set`
 
 This is the missing consumer: refresh_models.py builds the per-category
 sequence, but nothing applied it back to the running agent. This script
-does -- for every auxiliary USE AS slot, it picks the best *available*
-model from that slot's free-first chain and writes it into config.yaml.
-The agent reads auxiliary.<task>.model on every call, so the change takes
-effect immediately (no restart needed).
+does -- for every auxiliary USE AS slot, it picks the best *available* model
+from that slot's free-first chain and writes it (and the correct provider)
+into config.yaml. The agent reads auxiliary.<task>.model on every call, so the
+change takes effect immediately (no restart needed).
 
-It is FAIL-SAFE: if a task already has a healthy pinned model, it leaves it
-alone. It only swaps a model that is (a) dead on the dead-list, or
-(b) absent from the live free catalog. Paid fallback is NEVER written -- the
-script only ever writes free-tier models.
+Self-fix for vision: NVIDIA catalog models do NOT use the OpenRouter ":free"
+suffix. model_router._MODEL_PROVIDER_FIX maps the bare/free id to the correct
+(provider, model-id) so vision_analyze uses nvidia/nemotron-nano-12b-v2-vl via
+the NVIDIA endpoint (where it works) instead of OpenRouter (where it 404s).
 
-Run:  python3 /opt/data/apply_model_routing.py
-Also invoked by the daily cron after refresh_models.py.
+FAIL-SAFE: if a task already has a healthy pinned model, it is left alone.
+Paid fallback is NEVER written -- free-tier only.
 """
 from __future__ import annotations
 
@@ -34,20 +35,10 @@ SEQ = os.path.join(HERE, "models_sequence.json")
 DEAD = os.path.join(HERE, "model_deadlist.json")
 HERMES = "/opt/hermes/bin/hermes"
 
-# config.yaml auxiliary.<task> key -> category key in models_sequence.json
-TASK_TO_CATEGORY = {
-    "vision": "vision",
-    "mcp": "mcp",
-    "skill_hub": "skill_hub",
-    "approval": "approval",
-    "web_extract": "web_extract",
-    "compression": "compression",
-    "title_generation": "title_gen",
-    "triage_specifier": "triage_specifier",
-    "kanban_decomposer": "kanban_decomposer",
-    "profile_describer": "profile_describer",
-    "curator": "curator",
-}
+import model_router as r
+
+TASK_TO_CATEGORY = r._TASK_TO_CATEGORY
+MODEL_PROVIDER_FIX = r._MODEL_PROVIDER_FIX
 
 
 def _load_dead() -> dict:
@@ -93,12 +84,16 @@ def _best_free(chain, dead: dict) -> str | None:
         if m in dead:
             continue
         return m
-    # fallback: first entry even if dead (TTL may lapse)
     for m in chain or []:
         m = (m or "").strip()
         if m:
             return m
     return None
+
+
+def _fix_provider(model: str):
+    """Return (provider, corrected_model) using the known fix map."""
+    return MODEL_PROVIDER_FIX.get(model, (None, model))
 
 
 def main() -> int:
@@ -122,35 +117,32 @@ def main() -> int:
         cfg_model = _config_get(f"auxiliary.{task}.model") or ""
         entry = cats.get(category) or {}
         chain = list(entry.get("free", []) or [])
-        # main chain as last resort
         chain = chain + list(main.get("free_chain", []) or [])
 
         best = _best_free(chain, dead)
         if not best:
             continue
         if cfg_model == best:
-            continue  # already correct, leave alone
+            continue
         if cfg_model and cfg_model not in dead and cfg_model in (chain or []):
-            # configured model is still free & healthy -> keep it
-            if cfg_model in [m for m in (chain or []) if m]:
-                continue
-        if _config_set(f"auxiliary.{task}.model", best):
-            applied += 1
+            continue
 
-    # Main loop self-heal (mirrors refresh_models.self_heal_main_model)
+        prov, corrected = _fix_provider(best)
+        if _config_set(f"auxiliary.{task}.model", corrected):
+            applied += 1
+            if prov:
+                cur_prov = _config_get(f"auxiliary.{task}.provider") or ""
+                if cur_prov != prov:
+                    _config_set(f"auxiliary.{task}.provider", prov)
+
+    # Main loop self-heal
     main_chain = main.get("free_chain", []) or []
     cur = _config_get("model.default") or ""
-    if cur and cur not in dead and (not main_chain or cur in main_chain):
-        pass  # healthy, leave
-    else:
+    if not (cur and cur not in dead and (not main_chain or cur in main_chain)):
         best = _best_free(main_chain, dead)
         if best and best != cur:
-            # provider resolution: try to read current provider
-            prov = _config_get("model.provider") or ""
             if _config_set("model.default", best):
                 applied += 1
-                if prov:
-                    _config_set("model.provider", prov)
 
     print(f"[ok] applied {applied} model routing change(s)")
     return 0
