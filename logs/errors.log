@@ -1,0 +1,25 @@
+2026-08-12 13:11:53,378 WARNING hermes_dashboard_plugin_kanban: Kanban event stream error: no such table: task_events
+2026-08-12 13:11:53,450 WARNING hermes_dashboard_plugin_kanban: Kanban event stream error: no such table: task_events
+2026-08-12 13:11:53,482 WARNING hermes_dashboard_plugin_kanban: Kanban event stream error: no such table: task_events
+2026-08-12 13:12:54,824 WARNING [20260810_152811_058f5f] agent.auxiliary_client: Auxiliary Nous client unavailable: no Nous authentication found (run: hermes auth).
+2026-08-12 13:12:54,825 WARNING [20260810_152811_058f5f] agent.auxiliary_client: Auxiliary: marking nous unhealthy for 60s (payment / credit error). Subsequent auxiliary calls will skip it until 13:13:54.
+2026-08-12 13:12:54,826 WARNING [20260810_152811_058f5f] agent.auxiliary_client: resolve_provider_client: nous requested but Nous Portal not configured (run: hermes auth)
+2026-08-12 13:12:55,460 WARNING [20260810_152811_058f5f] agent.auxiliary_client: Auxiliary: marking openrouter unhealthy for 600s (payment / credit error). Subsequent auxiliary calls will skip it until 13:22:55.
+2026-08-12 13:12:55,500 WARNING [20260810_152811_058f5f] hermes_cli.copilot_auth: Token from GITHUB_TOKEN is not supported: Classic Personal Access Tokens (ghp_*) are not supported by the Copilot API. Use one of:
+  → `copilot login` or `hermes model` to authenticate via OAuth
+  → A fine-grained PAT (github_pat_*) with Copilot Requests permission
+  → `gh auth login` with the default device code flow (produces gho_* tokens)
+2026-08-12 13:12:55,505 WARNING [20260810_152811_058f5f] hermes_cli.copilot_auth: Token from GITHUB_TOKEN is not supported: Classic Personal Access Tokens (ghp_*) are not supported by the Copilot API. Use one of:
+  → `copilot login` or `hermes model` to authenticate via OAuth
+  → A fine-grained PAT (github_pat_*) with Copilot Requests permission
+  → `gh auth login` with the default device code flow (produces gho_* tokens)
+2026-08-12 13:12:55,506 WARNING [20260810_152811_058f5f] hermes_cli.copilot_auth: Token from GITHUB_TOKEN is not supported: Classic Personal Access Tokens (ghp_*) are not supported by the Copilot API. Use one of:
+  → `copilot login` or `hermes model` to authenticate via OAuth
+  → A fine-grained PAT (github_pat_*) with Copilot Requests permission
+  → `gh auth login` with the default device code flow (produces gho_* tokens)
+2026-08-12 13:12:55,794 WARNING [20260810_152811_058f5f] agent.auxiliary_client: Auxiliary: marking api-key unhealthy for 600s (payment / credit error). Subsequent auxiliary calls will skip it until 13:22:55.
+2026-08-12 13:12:55,794 WARNING [20260810_152811_058f5f] agent.auxiliary_client: Auxiliary approval: fallback candidate api-key has a stale/unrefreshable credential (Gemini HTTP 401 (UNAUTHENTICATED): Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+
+Google Gemini rejected this API key's type — you do NOT need OAuth. Google began rejecting legacy 'Standard' Google Cloud keys for the Gemini API on June 19, 2026, and all Standard keys stop working in September 2026. Open https://aistudio.google.com/api-keys, check the key's type and status, and create a replacement Gemini API key (or, as a temporary bridge, restrict the Standard key to generativelanguage.googleapis.com). Then update GEMINI_API_KEY / GOOGLE_API_KEY in ~/.hermes/.env and restart your session. Details: https://ai.google.dev/gemini-api/docs/api-key) — skipping to next fallback
+2026-08-12 13:12:55,806 WARNING [20260810_152811_058f5f] agent.auxiliary_client: Auxiliary approval: stale fallback credential on auto and no fallback available (tried: openrouter (unhealthy), nous (unhealthy), local/custom, api-key (unhealthy))
+2026-08-12 13:12:55,806 WARNING [20260810_152811_058f5f] agent.auxiliary_client: Auxiliary approval: payment error on auto and all fallbacks exhausted (fallback_chain + main agent model). Raising original error.
