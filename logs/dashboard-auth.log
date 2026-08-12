@@ -1,0 +1,9 @@
+{"ts":"2026-08-12T13:16:26.184105+00:00","event":"ws_ticket_minted","provider":"basic","user_id":"admin","ip":"172.17.0.1"}
+{"ts":"2026-08-12T13:16:26.216451+00:00","event":"ws_ticket_minted","provider":"basic","user_id":"admin","ip":"172.17.0.1"}
+{"ts":"2026-08-12T13:16:26.220491+00:00","event":"ws_ticket_minted","provider":"basic","user_id":"admin","ip":"172.17.0.1"}
+{"ts":"2026-08-12T13:16:26.228911+00:00","event":"ws_ticket_minted","provider":"basic","user_id":"admin","ip":"172.17.0.1"}
+{"ts":"2026-08-12T13:18:03.763112+00:00","event":"ws_ticket_minted","provider":"basic","user_id":"admin","ip":"172.17.0.1"}
+{"ts":"2026-08-12T13:18:05.450559+00:00","event":"ws_ticket_minted","provider":"basic","user_id":"admin","ip":"172.17.0.1"}
+{"ts":"2026-08-12T13:18:05.706448+00:00","event":"ws_ticket_minted","provider":"basic","user_id":"admin","ip":"172.17.0.1"}
+{"ts":"2026-08-12T13:18:05.707233+00:00","event":"ws_ticket_minted","provider":"basic","user_id":"admin","ip":"172.17.0.1"}
+{"ts":"2026-08-12T13:18:05.707761+00:00","event":"ws_ticket_minted","provider":"basic","user_id":"admin","ip":"172.17.0.1"}

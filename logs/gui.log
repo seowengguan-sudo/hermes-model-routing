@@ -1,0 +1,6 @@
+2026-08-12 13:16:26,268 INFO hermes_cli.web_server: pty accepted peer=172.17.0.1 mode=gated cred=ticket
+2026-08-12 13:16:26,579 INFO tui_gateway.ws: ws closed peer=172.17.0.1:33380 reason=client_disconnect(code=1005,reason=) messages=1 parse_errors=0 dispatch_crashes=0 send_failures=0 reaped_sessions=1 detached_sessions=0
+2026-08-12 13:16:26,588 INFO tui_gateway.ws: ws accepted peer=172.17.0.1:38852
+2026-08-12 13:18:06,118 INFO hermes_cli.web_server: pty accepted peer=172.17.0.1 mode=gated cred=ticket
+2026-08-12 13:18:06,154 INFO tui_gateway.ws: ws accepted peer=172.17.0.1:36584
+2026-08-12 13:18:06,191 INFO tui_gateway.ws: ws closed peer=172.17.0.1:38852 reason=client_disconnect(code=1005,reason=) messages=1 parse_errors=0 dispatch_crashes=0 send_failures=0 reaped_sessions=1 detached_sessions=0
