@@ -1,0 +1,9 @@
+context_lengths:
+  anthropic/claude-haiku-4.5@https://inference-api.nousresearch.com/v1: 409600
+  deepseek/deepseek-v4-flash@https://inference-api.nousresearch.com/v1: 1048576
+  inclusionai/ling-3.0-flash:free@https://inference-api.nousresearch.com/v1: 262144
+  nvidia/nemotron-3-ultra-550b-a55b:free@https://inference-api.nousresearch.com/v1: 512288
+  poolside/laguna-s-2.1:free@https://inference-api.nousresearch.com/v1: 262144
+  poolside/laguna-xs-2.1:free@https://inference-api.nousresearch.com/v1: 262144
+  stepfun/step-3.7-flash:free@https://inference-api.nousresearch.com/v1: 262144
+  tencent/hy3:free@https://inference-api.nousresearch.com/v1: 262144

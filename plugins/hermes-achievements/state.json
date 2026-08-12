@@ -1,0 +1,14 @@
+{
+  "unlocks": {
+    "model_sommelier": {
+      "evidence": null,
+      "first_tier": "Silver",
+      "unlocked_at": 1786103278
+    },
+    "provider_polyglot": {
+      "evidence": null,
+      "first_tier": "Copper",
+      "unlocked_at": 1786103278
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "_comment": "Local proxy counters for rate/credit limits. Approximate (estimated tokens). NOT a billing meter. Reset daily for rolling limits; NIM credit is lifetime.",
+  "date": "2026-08-10",
+  "limits": {
+    "nous_portal": {"rpm": 20, "tpm": 500, "window": "rolling-per-minute"},
+    "nvidia_nim": {"rpm": 40, "lifetime_credits": 1000, "credit_used": 0, "exhausted": false},
+    "openrouter": {"reset": "MYT 08:00 daily"},
+    "deepseek": {"paid": true, "balance_source": "user"},
+    "gemini": {"paid": true, "balance_source": "user"}
+  },
+  "models": {
+    "tencent/hy3:free": {"provider": "nous", "req_count": 0, "token_count": 0, "last_429": null, "exhausted": false},
+    "nvidia/nemotron-3-ultra-550b-a55b:free": {"provider": "nous", "req_count": 0, "token_count": 0, "last_429": null, "exhausted": false},
+    "nvidia/nemotron-3-super-120b-a12b:free": {"provider": "nous", "req_count": 0, "token_count": 0, "last_429": null, "exhausted": false},
+    "poolside/laguna-s-2.1:free": {"provider": "openrouter", "req_count": 0, "token_count": 0, "last_429": null, "exhausted": false},
+    "poolside/laguna-xs-2.1:free": {"provider": "openrouter", "req_count": 0, "token_count": 0, "last_429": null, "exhausted": false},
+    "nvidia/nemotron-nano-12b-v2-vl:free": {"provider": "openrouter", "req_count": 0, "token_count": 0, "last_429": null, "exhausted": false},
+    "google/gemma-4-31b-it:free": {"provider": "openrouter", "req_count": 0, "token_count": 0, "last_429": null, "exhausted": false},
+    "nvidia/nemotron-3-nano-30b-a3b:free": {"provider": "openrouter", "req_count": 0, "token_count": 0, "last_429": null, "exhausted": false},
+    "deepseek-v4-flash": {"provider": "deepseek", "req_count": 0, "token_count": 0, "est_cost_usd": 0.0, "exhausted": false},
+    "gemini-3.5-flash": {"provider": "gemini", "req_count": 0, "token_count": 0, "est_cost_usd": 0.0, "exhausted": false}
+  },
+  "nim_removed_models": []
+}

@@ -1,0 +1,323 @@
+{
+  "inventory": {
+    "nvidia": {
+      "note": "Free tier: 1000 calls/month",
+      "models": [
+        {
+          "id": "deepseek-ai/deepseek-v4-flash",
+          "strength": "code",
+          "context": 262144,
+          "type": "chat"
+        },
+        {
+          "id": "deepseek-ai/deepseek-v4-pro",
+          "strength": "code+",
+          "context": 262144,
+          "type": "chat"
+        },
+        {
+          "id": "meta/llama-3.3-70b-instruct",
+          "strength": "general",
+          "context": 131072,
+          "type": "chat"
+        },
+        {
+          "id": "meta/llama-3.1-70b-instruct",
+          "strength": "general",
+          "context": 131072,
+          "type": "chat"
+        },
+        {
+          "id": "meta/llama-3.1-8b-instruct",
+          "strength": "fast",
+          "context": 131072,
+          "type": "chat"
+        },
+        {
+          "id": "mistralai/mistral-large-2-instruct",
+          "strength": "reasoning",
+          "context": 131072,
+          "type": "chat"
+        },
+        {
+          "id": "mistralai/mixtral-8x22b-v0.1",
+          "strength": "expert",
+          "context": 65536,
+          "type": "chat"
+        },
+        {
+          "id": "google/gemma-4-31b-it",
+          "strength": "general",
+          "context": 262144,
+          "type": "chat"
+        },
+        {
+          "id": "google/gemma-3-12b-it",
+          "strength": "fast",
+          "context": 65536,
+          "type": "chat"
+        },
+        {
+          "id": "z-ai/glm-5.2",
+          "strength": "reasoning",
+          "context": 131072,
+          "type": "chat"
+        },
+        {
+          "id": "stepfun-ai/step-3.7-flash",
+          "strength": "fast",
+          "context": 262144,
+          "type": "chat"
+        }
+      ]
+    },
+    "groq": {
+      "note": "Free: 30 req/min, 14400 req/day",
+      "models": [
+        {
+          "id": "llama-3.3-70b-versatile",
+          "strength": "general",
+          "context": 131072,
+          "type": "chat"
+        },
+        {
+          "id": "llama-3.1-8b-instant",
+          "strength": "fast",
+          "context": 131072,
+          "type": "chat"
+        },
+        {
+          "id": "groq/compound",
+          "strength": "reasoning",
+          "context": 131072,
+          "type": "chat"
+        },
+        {
+          "id": "groq/compound-mini",
+          "strength": "fast",
+          "context": 131072,
+          "type": "chat"
+        },
+        {
+          "id": "openai/gpt-oss-120b",
+          "strength": "code+",
+          "context": 131072,
+          "type": "chat"
+        },
+        {
+          "id": "openai/gpt-oss-20b",
+          "strength": "code",
+          "context": 131072,
+          "type": "chat"
+        },
+        {
+          "id": "qwen/qwen3.6-27b",
+          "strength": "general",
+          "context": 131072,
+          "type": "chat"
+        }
+      ]
+    },
+    "openrouter": {
+      "note": "Free models have varying rate limits per model provider",
+      "models": [
+        {
+          "id": "openrouter/free",
+          "strength": "auto",
+          "context": 200000,
+          "type": "chat"
+        },
+        {
+          "id": "nvidia/nemotron-3-ultra-550b-a55b:free",
+          "strength": "expert",
+          "context": 1000000,
+          "type": "chat"
+        },
+        {
+          "id": "nvidia/nemotron-3-super-120b-a12b:free",
+          "strength": "expert",
+          "context": 263000,
+          "type": "chat"
+        },
+        {
+          "id": "nvidia/nemotron-3-nano-30b-a3b:free",
+          "strength": "general",
+          "context": 256000,
+          "type": "chat"
+        },
+        {
+          "id": "google/gemma-4-31b-it:free",
+          "strength": "general",
+          "context": 262144,
+          "type": "chat"
+        },
+        {
+          "id": "google/gemma-4-26b-a4b-it:free",
+          "strength": "general",
+          "context": 262144,
+          "type": "chat"
+        },
+        {
+          "id": "google/lyria-3-pro-preview",
+          "strength": "expert",
+          "context": 1048576,
+          "type": "chat"
+        },
+        {
+          "id": "openai/gpt-oss-20b:free",
+          "strength": "code",
+          "context": 131072,
+          "type": "chat"
+        },
+        {
+          "id": "cohere/north-mini-code:free",
+          "strength": "code",
+          "context": 256000,
+          "type": "chat"
+        },
+        {
+          "id": "inclusionai/ling-3.0-flash:free",
+          "strength": "fast",
+          "context": 262144,
+          "type": "chat"
+        },
+        {
+          "id": "poolside/laguna-s-2.1:free",
+          "strength": "code",
+          "context": 262144,
+          "type": "chat"
+        }
+      ]
+    },
+    "cerebras": {
+      "note": "Free tier, extremely fast inference",
+      "models": [
+        {
+          "id": "gpt-oss-120b",
+          "strength": "code+",
+          "context": 131072,
+          "type": "chat"
+        },
+        {
+          "id": "gemma-4-31b",
+          "strength": "general",
+          "context": 131072,
+          "type": "chat"
+        },
+        {
+          "id": "zai-glm-4.7",
+          "strength": "reasoning",
+          "context": 131072,
+          "type": "chat"
+        }
+      ]
+    },
+    "huggingface": {
+      "note": "Thousands of models via serverless inference. Key ones listed.",
+      "models": [
+        {
+          "id": "Qwen/Qwen2.5-7B-Instruct",
+          "strength": "general",
+          "context": 32768,
+          "type": "chat"
+        },
+        {
+          "id": "Qwen/Qwen2.5-14B-Instruct",
+          "strength": "general",
+          "context": 32768,
+          "type": "chat"
+        },
+        {
+          "id": "Qwen/Qwen2.5-32B-Instruct",
+          "strength": "code",
+          "context": 32768,
+          "type": "chat"
+        },
+        {
+          "id": "meta-llama/Llama-3.1-8B-Instruct",
+          "strength": "general",
+          "context": 131072,
+          "type": "chat"
+        },
+        {
+          "id": "Qwen/Qwen3-Coder-30B-A3B-Instruct",
+          "strength": "code",
+          "context": 32768,
+          "type": "chat"
+        }
+      ]
+    },
+    "nous_portal": {
+      "note": "OAuth built-in (subscription). Models via portal backend.",
+      "models": [
+        {
+          "id": "Nous Portal (various open-source models via OAuth)",
+          "strength": "auto",
+          "context": "varies",
+          "type": "chat"
+        }
+      ]
+    }
+  },
+  "task_categories": {
+    "simple_factual": {
+      "description": "Simple factual lookup, one-sentence answer",
+      "complexity": 1,
+      "ideal_strengths": [
+        "fast",
+        "general"
+      ],
+      "sample_prompt": "What is the default port for PostgreSQL? Reply in one sentence."
+    },
+    "code_generation_basic": {
+      "description": "Write a simple function with docstring",
+      "complexity": 3,
+      "ideal_strengths": [
+        "fast",
+        "code",
+        "general"
+      ],
+      "sample_prompt": "Write a Python function `is_palindrome(s)` returning True if palindrome ignoring case/spaces. Include docstring."
+    },
+    "code_generation_complex": {
+      "description": "Write a data structure or algorithm with edge cases",
+      "complexity": 5,
+      "ideal_strengths": [
+        "code",
+        "code+",
+        "reasoning"
+      ],
+      "sample_prompt": "Write a Python class `LRUCache` with get/put using OrderedDict, max_size param, type hints."
+    },
+    "debugging_reasoning": {
+      "description": "Diagnose a bug and propose fix",
+      "complexity": 6,
+      "ideal_strengths": [
+        "reasoning",
+        "code+",
+        "expert"
+      ],
+      "sample_prompt": "FastAPI app returns intermittent 500: 'asyncio.run() cannot be called from running event loop'. Root cause and fix?"
+    },
+    "architecture_design": {
+      "description": "Design system architecture, multiple components",
+      "complexity": 7,
+      "ideal_strengths": [
+        "reasoning",
+        "expert",
+        "code+"
+      ],
+      "sample_prompt": "Design microservice architecture for payment reconciliation. List services, data flow, failure modes. 300 words max."
+    },
+    "cross_domain_synthesis": {
+      "description": "Combine patterns from different domains",
+      "complexity": 8,
+      "ideal_strengths": [
+        "expert",
+        "reasoning",
+        "auto"
+      ],
+      "sample_prompt": "How could event sourcing from fintech be adapted for healthcare audit trails? 3 similarities, 2 differences. 200 words."
+    }
+  }
+}

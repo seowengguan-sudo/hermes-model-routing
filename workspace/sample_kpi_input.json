@@ -1,0 +1,66 @@
+{
+    "OAKAI_KPI_Dashboard": {
+        "sections": [
+            {
+                "header": "Production Efficiency Metrics",
+                "tables": [
+                    {
+                        "headers": ["Line ID", "Efficiency %", "Output Units", "Target Units", "Status"],
+                        "rows": [
+                            ["Line A", 87.5, 1250, 1400, "MEETS"],
+                            ["Line B", 92.3, 1580, 1600, "EXCEEDS"],
+                            ["Line C", 64.1, 890, 1200, "BEHIND"],
+                            ["Line D", 78.9, 1100, 1300, "NEEDS ATTENTION"]
+                        ],
+                        "name": "tblEfficiency",
+                        "formats": {
+                            "col2": "percentage",
+                            "col3": "currency",
+                            "col4": "currency"
+                        }
+                    }
+                ]
+            },
+            {
+                "header": "Quality Control Summary",
+                "tables": [
+                    {
+                        "headers": ["Defect Type", "Count", "Rate %", "Cost (RM)"],
+                        "rows": [
+                            ["Surface Scratch", 23, 1.2, 4600],
+                            ["Dimensional", 15, 0.8, 3000],
+                            ["Assembly Error", 8, 0.4, 1600],
+                            ["Packaging", 31, 1.6, 6200]
+                        ],
+                        "name": "tblQuality",
+                        "formats": {
+                            "col3": "percentage",
+                            "col4": "currency"
+                        }
+                    }
+                ]
+            },
+            {
+                "header": "Cost Analysis",
+                "tables": [
+                    {
+                        "headers": ["Category", "Budget (RM)", "Actual (RM)", "Variance (RM)", "Utilization %"],
+                        "rows": [
+                            ["Raw Materials", 50000, 47500, -2500, 95.0],
+                            ["Labor", 30000, 31200, 1200, 104.0],
+                            ["Overhead", 15000, 14800, -200, 98.7],
+                            ["Maintenance", 10000, 11500, 1500, 115.0]
+                        ],
+                        "name": "tblCosts",
+                        "formats": {
+                            "col2": "currency",
+                            "col3": "currency",
+                            "col4": "currency",
+                            "col5": "percentage"
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+}

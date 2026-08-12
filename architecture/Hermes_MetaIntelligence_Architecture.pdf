@@ -1,0 +1,223 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [6 0 R 8 0 R 10 0 R] /Count 3 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>
+endobj
+5 0 obj
+<< /Length 4871 >>
+stream
+0.12 g 0 760 595 82 re f 0 g
+BT /F2 20 Tf 1 0 0 1 40 815 Tm (Hermes Meta-Intelligence Architecture) Tj ET
+BT /F1 11 Tf 1 0 0 1 40 792 Tm (Master Agent + Industry Specialist Agents + Free-Tier Model Routing) Tj ET
+BT /F1 9 Tf 1 0 0 1 40 772 Tm (Vision: A self-improving, cost-free, hallucination-safe agentic system) Tj ET
+BT /F1 8 Tf 1 0 0 1 40 755 Tm (Generated for client development work  |  Confidential) Tj ET
+0.85 g 0 714 595 18 re f 0 g
+BT /F2 12 Tf 1 0 0 1 42 719 Tm (1.  Executive Overview) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 698 Tm (This architecture enables a single user to operate a fleet of AI agents that:) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 685 Tm (Learn continuously across industries without leaking client data,) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 672 Tm (Route every task to the most cost-effective free-tier model automatically,) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 659 Tm (Never hallucinate unverified facts \(every claim is traced to a source\),) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 646 Tm (Self-improve via a gated learning cadence requiring user approval.) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 633 Tm () Tj ET
+BT /F1 9 Tf 1 0 0 1 42 620 Tm (Core principle: ONE Master Agent \(the strategist\) orchestrates MANY industry-) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 607 Tm (specific Specialist Agents. Each Specialist owns its own knowledge, skills, and) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 594 Tm (state.db. The Master owns cross-domain patterns and meta-skills.) Tj ET
+0.85 g 0 555 595 18 re f 0 g
+BT /F2 12 Tf 1 0 0 1 42 560 Tm (2.  System Topology) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 539 Tm (  YOU \(User / Decision Authority\)) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 527.5 Tm (        |) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 516.0 Tm (        v) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 504.5 Tm (  +---------------------------+) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 493.0 Tm (  |   MASTER AGENT \(default\)  |) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 481.5 Tm (  |   - Classify domain       |) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 470.0 Tm (  |   - Detect new industry   |) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 458.5 Tm (  |   - Cross-leverage patterns|) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 447.0 Tm (  |   - Choose best model     |) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 435.5 Tm (  |   - Synthesize + Approve   |) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 424.0 Tm (  +-----+----------+----------+) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 412.5 Tm (        |          |          |) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 401.0 Tm (  +-----v--+   +---v----+  +--v-------+) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 389.5 Tm (  | Fintech|   | Health |  | E-com    |   \(auto-created as needed\)) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 378.0 Tm (  | Agent  |   | Agent  |  | Agent    |) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 366.5 Tm (  | .state |   | .state |  | .state   |) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 355.0 Tm (  | .memory|   | .memory|  | .memory  |) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 343.5 Tm (  | .skills|   | .skills|  | .skills  |) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 332.0 Tm (  +--------+   +--------+  +----------+) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 320.5 Tm (        |          |          |) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 309.0 Tm (  +-----v----------v----------v-------+) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 297.5 Tm (  |  MODEL ROUTER \(free-tier providers\)|) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 286.0 Tm (  |  NVIDIA | OpenRouter | \(Groq/Cereb/|) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 274.5 Tm (  |  HF/Nous when network allows\)      |) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 263.0 Tm (  +-------------------------------------+) Tj ET
+0.85 g 0 225.5 595 18 re f 0 g
+BT /F2 12 Tf 1 0 0 1 42 230.5 Tm (3.  Master Agent - Role & Storage) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 209.5 Tm (Profile: default  |  Runs on: free-tier model \(Tier 2-3\)) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 196.5 Tm (Storage under /opt/data/.hermes/profiles/master/ :) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 183.5 Tm (memory/USER.md ............ your identity, style, preferences) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 170.5 Tm (knowledge/master/) Tj ET
+BT /F1 9 Tf 1 0 0 1 62 157.5 Tm (meta-skills/ ....... first-principles, cross-domain pattern recog,) Tj ET
+BT /F1 9 Tf 1 0 0 1 72 144.5 Tm (                   decision frameworks, verification protocols) Tj ET
+BT /F1 9 Tf 1 0 0 1 62 131.5 Tm (pattern-library/ ... generalized cross-domain patterns \(owned here\)) Tj ET
+BT /F1 9 Tf 1 0 0 1 62 118.5 Tm (industry-summaries/ one-page-per-industry strategic view) Tj ET
+BT /F1 9 Tf 1 0 0 1 62 105.5 Tm (innovation-log/ .... novel solutions discovered across domains) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 92.5 Tm (skills/meta/ ....... meta-procedures for orchestration) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 79.5 Tm (state.db ........... Master's own conversation history) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 66.5 Tm (Decision authority: classification, delegation, learning approval, model choice.) Tj ET
+0.85 g 0 27.5 595 18 re f 0 g
+BT /F2 12 Tf 1 0 0 1 42 32.5 Tm (4.  Specialist Agent - Structure \(per industry\)) Tj ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 5 0 R >>
+endobj
+7 0 obj
+<< /Length 4707 >>
+stream
+BT /F1 9 Tf 1 0 0 1 42 800 Tm (Profile: <industry>  \(e.g. fintech, healthcare, ecommerce\)) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 787 Tm (Auto-created by Master when a new industry is detected.) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 774 Tm (Organized by SUB-SEGMENT for cost-efficient context loading:) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 761 Tm (sub-segment: Payments) Tj ET
+BT /F1 9 Tf 1 0 0 1 62 748 Tm (skills/payments/ ...... domain-specific procedures) Tj ET
+BT /F1 9 Tf 1 0 0 1 62 735 Tm (knowledge/clients/ ... per-client project knowledge) Tj ET
+BT /F1 9 Tf 1 0 0 1 62 722 Tm (knowledge/patterns/ .. domain patterns \(not yet generalized\)) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 709 Tm (sub-segment: Lending, Insurance, RegTech ... \(same shape\)) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 696 Tm (Isolation guarantee: separate profile = separate state.db, memory, skills.) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 683 Tm (No client data or conversation can cross into another industry profile.) Tj ET
+0.85 g 0 644 595 18 re f 0 g
+BT /F2 12 Tf 1 0 0 1 42 649 Tm (5.  Free-Tier Model Routing Engine) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 628 Tm (37 free chat/code models benchmarked across 6 providers) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 615 Tm (\(6 task types each\). Results in /opt/data/model_benchmark/results.json.) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 602 Tm () Tj ET
+BT /F1 9 Tf 1 0 0 1 42 589 Tm (VALIDATED WORKING PROVIDERS \(this sandbox environment\):) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 576 Tm (NVIDIA NIM ....... Llama-3.1-8B scored 9.83/10 \(4.5s\) - TOP model) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 563 Tm (OpenRouter ....... Nemotron-3-super-120B 8.83/10, ultra-550B 8.17) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 550 Tm () Tj ET
+BT /F1 9 Tf 1 0 0 1 42 537 Tm (BLOCKED FROM SANDBOX \(403/timeout on direct API call\):) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 524 Tm (Groq, Cerebras, HuggingFace, Nous Portal) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 511 Tm (Likely work from your laptop. Router auto-excludes failed) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 498 Tm (providers; re-run validate.py elsewhere to unlock them.) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 485 Tm () Tj ET
+BT /F1 9 Tf 1 0 0 1 42 472 Tm (Routing decision \(per prompt\):) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 459 Tm (1. Classify task type + complexity \(1-10\)) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 446 Tm (2. Match to validated model by \(score + strength - latency\)) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 433 Tm (3. Skip providers that failed validation in this environment) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 420 Tm (4. Fallback chain among working free providers only) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 407 Tm (5. PAID models \(Gemini/DeepSeek-direct\) NEVER without approval) Tj ET
+0.85 g 0 368 595 18 re f 0 g
+BT /F2 12 Tf 1 0 0 1 42 373 Tm (6.  Runtime Auto-Switch Behaviour) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 352 Tm (When OpenRouter \(or any provider\) is exhausted:) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 339 Tm (Router detects non-200 / quota error) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 326 Tm (Selects next-best validated free model \(same quality tier\)) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 313 Tm (System message informs user of the switch) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 300 Tm (Task continues uninterrupted on the new provider) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 287 Tm (Observed example: OpenRouter deepseek-v4-flash \(paid\) exhausted ->) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 274 Tm (auto-switched to z-ai/glm-5.2 via NVIDIA NIM \(free\). Later to) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 261 Tm (tencent/hy3:free via Nous Portal. No user intervention required.) Tj ET
+0.85 g 0 222 595 18 re f 0 g
+BT /F2 12 Tf 1 0 0 1 42 227 Tm (7.  Learning Cadence - Mutual Growth) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 206 Tm (Every learning write is GATED by dual confirmation:) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 193 Tm (Specialist confirms: 'useful for my domain' \(Yes\)) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 180 Tm (Master confirms: 'useful cross-domain / quality improvement' \(Yes\)) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 167 Tm (Master drafts proposal with context + rationale) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 154 Tm (USER reviews + approves or comments \(required\)) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 141 Tm (Only then is skill/knowledge/memory written or edited) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 128 Tm () Tj ET
+BT /F1 9 Tf 1 0 0 1 42 115 Tm (Auto-fix WITHOUT approval \(notified after\):) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 102 Tm (- spelling/typo in existing skill) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 89 Tm (- rate-limit workaround \(model tier switch\)) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 76 Tm (- obvious factual correction \(e.g. wrong port number\)) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 63 Tm () Tj ET
+BT /F1 9 Tf 1 0 0 1 42 50 Tm (This ensures Hermes and the user grow together, structured and safe.) Tj ET
+0.85 g 0 11 595 18 re f 0 g
+BT /F2 12 Tf 1 0 0 1 42 16 Tm (8.  Anti-Hallucination Assurance) Tj ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 7 0 R >>
+endobj
+9 0 obj
+<< /Length 4597 >>
+stream
+BT /F1 9 Tf 1 0 0 1 42 800 Tm (Rule 1  Every output grounded in a stored fact \(cited source\).) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 787 Tm (Rule 2  Certainty ladder: Verified / Inferred / Unknown / Contradictory.) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 774 Tm (Rule 3  Verification protocol runs at end of every specialist task:) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 761 Tm (  [] every claim traced  [] assumptions flagged  [] no client data leaked) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 748 Tm (  [] cross-checked vs Master patterns  [] confidence reported) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 735 Tm (Rule 4  Supervisor pattern for critical decisions \(Master reviews\).) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 722 Tm (Rule 5  Confidence < 80% on classification -> ask user, never assume.) Tj ET
+0.85 g 0 683 595 18 re f 0 g
+BT /F2 12 Tf 1 0 0 1 42 688 Tm (9.  Continuous Self-Improvement) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 667 Tm (Gap detection triggers:) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 654 Tm (- User corrects the agent  -> patch skill/memory + log) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 641 Tm (- Classification wrong     -> update classification rules) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 628 Tm (- Low-quality answer        -> flag pattern for revision) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 615 Tm (- Missing skill             -> create placeholder, ask user to fill) Tj ET
+BT /F1 9 Tf 1 0 0 1 52 602 Tm (- New industry detected     -> auto-create Specialist profile) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 589 Tm () Tj ET
+BT /F1 9 Tf 1 0 0 1 42 576 Tm (Model fitness: results logged per task type; under-performers downgraded,) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 563 Tm (over-engineered models downgraded to save tokens. Compounded over time.) Tj ET
+0.85 g 0 524 595 18 re f 0 g
+BT /F2 12 Tf 1 0 0 1 42 529 Tm (10.  Complete Storage Map) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 508 Tm (/opt/data/.hermes/) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 496.5 Tm (|-- config.yaml ........... model tier rules) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 485.0 Tm (|-- .env .................. API keys \(6 free providers\)) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 473.5 Tm (|-- profiles/) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 462.0 Tm (|   |-- master/  \(state.db, memory/, skills/, knowledge/\)) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 450.5 Tm (|   |-- fintech/ \(same shape, isolated\)) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 439.0 Tm (|   |-- healthcare/) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 427.5 Tm (|   |-- ecommerce/) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 416.0 Tm (|-- knowledge/) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 404.5 Tm (|   |-- master/  \(pattern-library, meta-skills, summaries\)) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 393.0 Tm (|   |-- specialists/ <industry>/<sub-segment>/) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 381.5 Tm (|   |-- shared/ \(tool-configs, style-guides, templates\)) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 370.0 Tm (|-- model_benchmark/ \(validation results, router state\)) Tj ET
+BT /F2 7.5 Tf 1 0 0 1 46 358.5 Tm (|-- sessions/ \(request dumps, auto-cleaned\)) Tj ET
+0.85 g 0 321.0 595 18 re f 0 g
+BT /F2 12 Tf 1 0 0 1 42 326.0 Tm (11.  Cost Efficiency Guarantee) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 305.0 Tm (100% of routine + complex work runs on FREE-tier models.) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 292.0 Tm (Paid models \(Gemini / DeepSeek-direct\) blocked behind explicit approval.) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 279.0 Tm (Context kept lean via sub-segment loading \(no full-domain injection\).) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 266.0 Tm (Model chosen by validation, not guesswork -> no wasted heavy calls.) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 253.0 Tm (Estimated cost: $0/month for normal operation across all clients.) Tj ET
+0.85 g 0 214.0 595 18 re f 0 g
+BT /F2 12 Tf 1 0 0 1 42 219.0 Tm (12.  Implementation Status \(this session\)) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 198.0 Tm ([DONE] Scanned 6 providers + listed all free models \(37 total\)) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 185.0 Tm ([DONE] Built validate.py - per-model quality + latency benchmarking) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 172.0 Tm ([DONE] Ran validation: NVIDIA + OpenRouter working, others blocked) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 159.0 Tm ([DONE] Built router.py - validation-driven free-tier model selection) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 146.0 Tm ([DONE] Wrote this architecture PDF \(validated format\)) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 133.0 Tm ([NEXT] Wire router into Hermes config \(config.yaml model switch\)) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 120.0 Tm ([NEXT] Create fintech/healthcare/ecommerce profile directories) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 107.0 Tm ([NEXT] Build Master classification + delegation skills) Tj ET
+BT /F1 9 Tf 1 0 0 1 42 94.0 Tm ([NEXT] Re-run validation from laptop to unlock Groq/Cerebras/HF/Nous) Tj ET
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 9 0 R >>
+endobj
+xref
+0 11
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000128 00000 n 
+0000000198 00000 n 
+0000000266 00000 n 
+0000005189 00000 n 
+0000005325 00000 n 
+0000010084 00000 n 
+0000010220 00000 n 
+0000014869 00000 n 
+trailer
+<< /Size 11 /Root 1 0 R >>
+startxref
+15006
+%%EOF

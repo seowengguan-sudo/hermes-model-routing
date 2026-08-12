@@ -1,0 +1,50 @@
+PDF QUALITY / COMPLEX DOCUMENT TEST
+
+Now that the PDF skill pipeline has been confirmed operational, perform a second test specifically for complex architecture documentation.
+
+Create a 3-page PDF called:
+
+Hermes Architecture Rendering Test
+
+Page 1:
+
+Enterprise AI Control Centre overview
+Master Agent
+Specialist Agents
+Knowledge / Memory
+Skills / Tools
+Security / Governance
+Clear directional arrows
+
+Page 2:
+
+Master Agent → Orchestrator → Specialist Agents architecture
+Show at least 4 Specialist Agents
+Show task decomposition and result aggregation
+
+Page 3:
+
+Security / Guardrail architecture
+Agent → Policy → Permission → Tool → Execution → Verification → Audit
+
+Requirements:
+
+Use the activated PDF skill/template pipeline.
+Do NOT use ad-hoc PDF generation.
+Do NOT allow diagrams or text to overflow.
+Do NOT shrink text excessively just to make content fit.
+Maintain consistent typography and diagram notation.
+Ensure all arrows remain inside page boundaries.
+Ensure every diagram has a clear title.
+Verify the resulting PDF after generation.
+
+Report:
+
+PDF path
+File size
+Page count
+Whether any content overflow occurred
+Whether any diagram was clipped
+Whether any text became unreadably small
+Whether all pages rendered correctly
+Which PDF skill/template files were actually used.

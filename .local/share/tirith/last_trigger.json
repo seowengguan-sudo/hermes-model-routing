@@ -1,0 +1,22 @@
+{
+  "rule_ids": [
+    "mass_file_deletion"
+  ],
+  "severity": "CRITICAL",
+  "command_redacted": "cd /opt/data && rm -f knowledge/catchup.py && echo \"removed broken catchup.py\" &...",
+  "findings": [
+    {
+      "rule_id": "mass_file_deletion",
+      "severity": "CRITICAL",
+      "title": "Mass file deletion in a short window",
+      "description": "3 non-build files were deleted within 20s. A burst of deletions can be destructive (ransomware-like or an accidental recursive wipe).",
+      "evidence": [
+        {
+          "type": "text",
+          "detail": "3 non-build files were deleted within 20s. A burst of deletions can be destructive (ransomware-like or an accidental recursive wipe)."
+        }
+      ]
+    }
+  ],
+  "timestamp": "2026-08-11T07:00:47.770362898+00:00"
+}
