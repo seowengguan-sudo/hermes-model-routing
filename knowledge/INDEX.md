@@ -29,6 +29,7 @@ Compact map. Agent reads full files on demand; this stays in active memory.
 - `creative/claude-design` — Design process + taste for one-off HTML artifacts
 - `creative/popular-web-designs` — 54 brand design systems (Stripe, Linear, Vercel, etc.)
 - `creative/architecture-diagram` — SVG cloud/infra diagrams (dark-themed)
-- `productivity/professional-doc-deliverables/` — Excel/PDF/diagram deliverables (reportlab + openpyxl)
+- `productivity/xlsx_kpi_engine.py` — Smart KPI dashboard builder with openpyxl (conditional formatting, Excel Tables, OAKAI brand styles, currency/percentage/kpi formatters). Import `generate_kpi_dashboard()` from `skills/productivity/`
+- `productivity/professional-doc-deliverables/SKILL.md` — Excel/PDF/diagram deliverables (reportlab + openpyxl)
 - `productivity/professional-doc-generation/SKILL.md` — Unified cross-format skill: format selection matrix, workflow, verification, pitfalls
 - `productivity/deep-research-methodology/` — 5-layer research-to-code framework, verification patterns, pitfall catalog
