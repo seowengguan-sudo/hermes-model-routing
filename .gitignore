@@ -70,3 +70,8 @@ projects.db
 projects.db-shm
 projects.db-wal
 projects.db-journal
+
+# ── Python bytecode caches (never commit) ──
+__pycache__/
+*.pyc
+*.pyo
