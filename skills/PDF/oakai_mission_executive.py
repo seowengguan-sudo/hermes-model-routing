@@ -2,8 +2,12 @@
 """
 oakai_mission_executive.py — Generates the OAKAI Mission Executive PDF.
 
-Uses the verified OAKAI design engine (skills/PDF/oakai_pdf_template.py)
-with high-contrast palette and professional layout discipline.
+Enhanced version with:
+- Larger font sizes for better page coverage and readability
+- Task deliverables for this week and next week (table format)
+- Professional layout improvements (bigger tables, more white space control)
+- SSM/domain/bank/Notion/LinkedIn status tracking
+- Updated COO roadmap with current status
 
 Run:
     python3 oakai_mission_executive.py
@@ -14,15 +18,39 @@ Output:
 import sys, os
 sys.path.insert(0, '/opt/data/lazy-packages')
 sys.path.insert(0, '/opt/data/skills/PDF')
-sys.path.insert(0, '/opt/data/skills/productivity/architecture-doc-pdf')
 
 from oakai_pdf_template import (
     build_document, section_header, status_table, checklist,
-    kv_callout_box, hr, styles, make_toc, FOOTER_LABEL, BRAND_NAME
+    kv_callout_box, hr, styles, make_toc, FOOTER_LABEL, BRAND_NAME,
+    TEAL_DARK, TEAL, GOLD, CHARCOAL, GREY, ROW_ALT, BORDER, WHITE
 )
 from reportlab.lib.units import mm
-from reportlab.platypus import Paragraph, Spacer, PageBreak, KeepTogether, Table
 from reportlab.lib import colors
+from reportlab.platypus import Paragraph, Spacer, PageBreak, KeepTogether, Table, TableStyle, PageTemplate, Frame, NextPageTemplate
+from reportlab.lib.enums import TA_LEFT, TA_JUSTIFY
+from reportlab.lib.styles import ParagraphStyle
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+
+# ── Enhanced styles for larger font sizes ──
+styles.add(ParagraphStyle("H1_big", fontName="Helvetica-Bold", fontSize=22,
+    leading=26, textColor=TEAL_DARK, spaceAfter=12))
+styles.add(ParagraphStyle("H2_big", fontName="Helvetica-Bold", fontSize=15,
+    leading=19, textColor=TEAL_DARK, spaceBefore=16, spaceAfter=8))
+styles.add(ParagraphStyle("Body_big", fontName="Helvetica", fontSize=11.2,
+    leading=16.8, textColor=CHARCOAL, alignment=TA_JUSTIFY, spaceAfter=8))
+styles.add(ParagraphStyle("BodySmall_big", fontName="Helvetica", fontSize=9.8,
+    leading=14, textColor=GREY, spaceAfter=6))
+styles.add(ParagraphStyle("CellHead_big", fontName="Helvetica-Bold", fontSize=10,
+    leading=13, textColor=WHITE))
+styles.add(ParagraphStyle("Cell_big", fontName="Helvetica", fontSize=10,
+    leading=14, textColor=CHARCOAL))
+styles.add(ParagraphStyle("Callout_big", fontName="Helvetica", fontSize=10.5,
+    leading=15, textColor=TEAL_DARK, spaceAfter=5))
+styles.add(ParagraphStyle("TaskItem_big", fontName="Helvetica", fontSize=10.5,
+    leading=15, textColor=CHARCOAL, spaceAfter=4, leftIndent=2))
+styles.add(ParagraphStyle("StatusBig", fontName="Helvetica-Bold", fontSize=11,
+    leading=14, alignment=TA_LEFT))
 
 # ── Document metadata ──
 DOC_DATE = "2026-08-13"
@@ -30,12 +58,81 @@ DOC_CLASSIFICATION = "OAKAI Confidential"
 PREPARED_FOR = "Weng Guan / Founder, OAKAI SDN BHD"
 DOC_TITLE = "OAKAI Mission & Roadmap"
 DOC_SUBTITLE = "Enterprise AI Business Solution Provider — Executive Brief"
-DOC_REF = "OAKAI-MIS-001"
+DOC_REF = "OAKAI-MIS-002"
+
+PAGE_W, PAGE_H = A4
+MARGIN = 20 * mm
+
+# ── Enhanced table helper with larger fonts ──
+def big_status_table(rows, col_widths=None):
+    """Like status_table but with larger fonts for better readability."""
+    header = [Paragraph(str(c), styles["CellHead_big"]) for c in rows[0]]
+    data = [header]
+    for r in rows[1:]:
+        data.append([Paragraph(str(c), styles["Cell_big"]) for c in r])
+    t = Table(data, colWidths=col_widths, repeatRows=1, hAlign='LEFT')
+    style = [
+        ("BACKGROUND", (0, 0), (-1, 0), TEAL_DARK),
+        ("TEXTCOLOR", (0, 0), (-1, 0), WHITE),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("TOPPADDING", (0, 0), (-1, -1), 6),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+        ("LEFTPADDING", (0, 0), (-1, -1), 8),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 8),
+        ("LINEBELOW", (0, 0), (-1, 0), 0.8, TEAL_DARK),
+        ("LINEBELOW", (0, 1), (-1, -1), 0.4, BORDER),
+    ]
+    for i in range(1, len(data)):
+        if i % 2 == 0:
+            style.append(("BACKGROUND", (0, i), (-1, i), ROW_ALT))
+    t.setStyle(TableStyle(style))
+    return t
+
+def section_header_big(number, title, subtitle=None):
+    """Larger section header for better hierarchy."""
+    flows = [Paragraph(number, styles["SectionNum"]),
+             Paragraph(title, styles["H1_big"])]
+    if subtitle:
+        flows.append(Paragraph(subtitle, styles["BodySmall_big"]))
+    flows.append(hr(color=GOLD, thickness=1.3, space_before=6, space_after=14))
+    return flows
+
+def section_header_h2(number, title, subtitle=None):
+    """H2-sized section header."""
+    flows = [Paragraph(number, styles["SectionNum"]),
+             Paragraph(title, styles["H2_big"])]
+    if subtitle:
+        flows.append(Paragraph(subtitle, styles["BodySmall_big"]))
+    flows.append(hr(color=BORDER, thickness=0.6, space_before=4, space_after=10))
+    return flows
+
+def checklist_big(items):
+    """Larger checklist items."""
+    return [Paragraph(f"&#8226;&nbsp;&nbsp;{it}", styles["TaskItem_big"])
+            for it in items]
+
+def kv_callout_box_big(title, body_lines):
+    """Larger callout box."""
+    content = [Paragraph(title, styles["H2_big"])]
+    for line in body_lines:
+        content.append(Paragraph(line, styles["Callout_big"]))
+    tbl = Table([[content]], colWidths=[PAGE_W - 2 * MARGIN])
+    tbl.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#E7F1EF")),
+        ("BOX", (0, 0), (-1, -1), 0.8, TEAL),
+        ("LEFTPADDING", (0, 0), (-1, -1), 14),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 14),
+        ("TOPPADDING", (0, 0), (-1, -1), 12),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 12),
+    ]))
+    return tbl
+
+# ── Section builders ──
 
 def build_executive_summary():
     """Section 01: Executive Summary — Verdict + positioning."""
     story = []
-    story += section_header("01", "Executive Summary", "Mission, positioning, and current state")
+    story += section_header_big("01", "Executive Summary", "Mission, positioning, and current state")
     
     story.append(Paragraph(
         "OAKAI SDN BHD is building an AI-powered business solution provider that targets "
@@ -43,37 +140,69 @@ def build_executive_summary():
         "Administration/Back-Office sectors. The startup is in the foundation phase: "
         "company registration is pending with SSM, while the AI infrastructure backbone "
         "is already operational on free-tier resources.",
-        styles["Body"]
+        styles["Body_big"]
     ))
     
-    story.append(kv_callout_box("Key Positioning", [
-        "AI solutions backed by a mental-model approach — not just tool integration",
-        "Free-tier-first economics (Nous Portal, OpenRouter, local LLM) eliminates upfront infrastructure cost",
-        "Vertical overlap: expertise in manufacturing/power-house, systems integration, and back-office "
-        "creates a unique intersection advantage for cross-industry AI solutions",
-        "POC-first methodology: validate with real customer pain before scaling to enterprise contracts"
+    story.append(Spacer(1, 6*mm))
+    story.append(kv_callout_box_big("Key Positioning", [
+        "<b>AI solutions backed by a mental-model approach</b> — not just tool integration. "
+        "We teach the 'how to think', not just 'what to deploy'.",
+        "<b>Free-tier-first economics</b> (Nous Portal, OpenRouter, local LLM) — zero upfront infrastructure cost. "
+        "Competitors spend on cloud; we prove ROI before asking clients to pay.",
+        "<b>Vertical overlap advantage</b> — Manufacturing + SI + Admin expertise creates unique cross-industry solutions "
+        "that single-vertical consultants miss 60% of.",
+        "<b>POC-first methodology</b> — Validate with real customer pain before scaling to enterprise contracts."
     ]))
-    
-    story.append(hr(color=colors.HexColor("#C69B4B"), thickness=1.0, space_before=8, space_after=12))
+    story.append(Spacer(1, 6*mm))
     
     story.append(Paragraph(
         "The company operates on a lean bootstrap model with a hard cap on paid API usage "
         "(founder approval required). The technology stack demonstrates viability without "
         "capital expenditure: local Qwen2.5-1.5B + bge-m3 provides inference, while "
         "free-tier cloud models (Nous Portal, OpenRouter) provide additional capacity.",
-        styles["Body"]
+        styles["Body_big"]
     ))
     
+    story.append(Spacer(1, 8*mm))
+    
+    return story
+
+def build_current_status_grid():
+    """New section: Current Status Grid — SSM, Domain, Bank, Notion, LinkedIn"""
+    story = []
+    story += section_header_big("02", "Current Status Grid", "Where things stand as of 2026-08-13")
+    
+    status_rows = [
+        ["Initiative", "Owner", "Status", "Deadline", "Next Action"],
+        ["<b>SSM Name Reservation</b>", "Founder", "Pending", "W1 D1", "File e-Lodgement with 3 names"],
+        ["<b>SSM Incorporation</b>", "Founder", "Pending", "W1 D5", "File private-limited incorporation after name approval"],
+        ["<b>Domain oakai.com.my</b>", "Founder", "Pending", "W1 D2", "Register via MYNIC-accredited registrar"],
+        ["<b>Bank Account</b>", "Founder", "Pending", "W2 D1", "Open after SSM receipt; founder bridge account tagged"],
+        ["<b>Notion Workspace</b>", "Founder", "Planned", "W2", "Set up for client project management + internal KB"],
+        ["<b>LinkedIn Profile</b>", "Founder", "Drafted", "W1 D1", "Publish + vanity URL linkedin.com/in/oakai-asia"],
+        ["<b>GitHub Repository</b>", "AI Co-pilot", "✅ Active", "Live", "5 commits pushed, model routing + skills repo"],
+        ["<b>AI Stack (local)</b>", "Ops", "✅ Running", "Live", "Qwen2.5-1.5B + bge-m3 via Ollama"],
+        ["<b>Gateway Service</b>", "Ops", "✅ Running", "Live", "s6-supervised, PID 46427, auto-restart"],
+        ["<b>Cron Automation</b>", "AI Co-pilot", "✅ Active", "Live", "6 jobs running, all pinned"],
+        ["<b>State Protection</b>", "Ops", "✅ Verified", "Live", "state.db gitignored + pre-commit hook blocks commits"],
+    ]
+    story.append(big_status_table(status_rows, col_widths=[35*mm, 25*mm, 22*mm, 22*mm, 45*mm]))
+    
     story.append(Spacer(1, 6*mm))
+    story.append(Paragraph(
+        "<i>Note:</i> All critical path items (SSM, bank, domain) must be completed before signing "
+        "the first client. The AI stack is fully operational and does not depend on any of these. "
+        "Notion will serve as the client-facing project management dashboard once set up.",
+        styles["BodySmall_big"]
+    ))
     
     return story
 
 def build_mvp_and_market():
-    """Section 02: MVP Definition & Market Positioning."""
+    """Section 03: MVP Definition & Market Positioning."""
     story = []
-    story += section_header("02", "MVP & Market", "Minimum viable product + target positioning")
+    story += section_header_big("03", "MVP & Market", "Minimum viable product + target positioning")
     
-    # MVP definition table
     mvp_rows = [
         ["Component", "What It Is", "Current Status", "Owner"],
         ["Local AI Stack", "Qwen2.5-1.5B + bge-m3 inference on local machine", "✅ Running", "Ops"],
@@ -84,13 +213,11 @@ def build_mvp_and_market():
         ["GitHub Presence", "Open-source knowledge + skills repo", "✅ Active (5 commits)", "AI Co-pilot"],
     ]
     story.append(Paragraph("The MVP stack is built on free-tier + local infrastructure, proving the "
-                          "business model works without paid compute:", styles["H3"]))
-    story.append(KeepTogether([
-        status_table(mvp_rows, col_widths=[30*mm, 50*mm, 30*mm, 30*mm])
-    ]))
+                          "business model works without paid compute:", styles["Body_big"]))
+    story.append(big_status_table(mvp_rows, col_widths=[30*mm, 50*mm, 35*mm, 30*mm]))
     
     story.append(Spacer(1, 6*mm))
-    story.append(Paragraph("Market positioning leverages three competitive advantages:", styles["H3"]))
+    story.append(Paragraph("Market positioning leverages three competitive advantages:", styles["H2_big"]))
     
     positioning_rows = [
         ["Advantage", "Description", "Differentiator"],
@@ -101,30 +228,81 @@ def build_mvp_and_market():
         ["Vertical Overlap", "Manufacturing + SI + Admin expertise creates unique cross-vertical solutions",
          "Single-vertical consultants miss 60% of integration opportunities"],
     ]
-    story.append(status_table(positioning_rows, col_widths=[40*mm, 70*mm, 40*mm]))
+    story.append(big_status_table(positioning_rows, col_widths=[40*mm, 70*mm, 40*mm]))
+    
+    return story
+
+def build_task_deliverables():
+    """Section 04: Task Deliverables — This Week + Next Week"""
+    story = []
+    story += section_header_big("04", "Task Deliverables", "This week and next — what needs to happen")
+    
+    # This Week
+    story += section_header_h2("04A", "This Week (Aug 13-19)", "Week 2 execution plan per COO Brief")
+    
+    this_week_rows = [
+        ["Day", "Task", "Owner", "Status", "Deliverable"],
+        ["Mon Aug 13", "SSM name reservation (3 names via e-Lodgement)", "Founder", "📋 Planned", "SSM receipt number"],
+        ["Mon Aug 13", "Publish LinkedIn Day-1 post + claim vanity URL", "Founder", "🔄 Drafted", "linkedin.com/in/oakai-asia live"],
+        ["Tue Aug 14", "Secure domain oakai.com.my (MYNIC registrar)", "Founder", "📋 Planned", "Domain registered + DNS"],
+        ["Tue Aug 14", "Draft landing page copy (Day-2 post + case hook)", "AI Co-pilot", "📋 Planned", "Landing page content v1"],
+        ["Wed Aug 15", "Mid-week checkpoint (W2 pulse)", "All", "📋 Planned", "Checkpoint report via cron"],
+        ["Thu Aug 16", "Week 1 retrospective + W2 COO Brief", "AI Co-pilot", "📋 Planned", "coo-brief-2026-W33.md"],
+        ["Thu Aug 16", "3 client survey outreach (launch)", "Founder", "📋 Planned", "3 survey responses targeted"],
+        ["Fri Aug 17", "PENSOLAR Demo Scenario 1 (anomaly detection)", "AI Co-pilot", "📋 Planned", "Demo script + mockup"],
+        ["Fri Aug 17", "Local LLM integration validated", "Ops", "📋 Planned", "Qwen2.5-1.5B inference verified"],
+        ["Sat Aug 18", "GitHub Pages landing site deployed", "AI Co-pilot", "📋 Planned", "Live URL + UTM tracked"],
+        ["Sun Aug 19", "COO Brief W3 delivered", "AI Co-pilot", "📋 Planned", "coo-brief-2026-W33.md published"],
+    ]
+    story.append(Paragraph("Critical path: SSM name must be reserved before bank account can open. "
+                          "Domain + LinkedIn must be live for landing page.", styles["BodySmall_big"]))
+    story.append(Spacer(1, 4*mm))
+    story.append(big_status_table(this_week_rows, col_widths=[20*mm, 45*mm, 25*mm, 15*mm, 45*mm]))
+    
+    story.append(Spacer(1, 8*mm))
+    
+    # Next Week
+    story += section_header_h2("04B", "Next Week (Aug 20-26)", "Week 3 execution plan")
+    
+    next_week_rows = [
+        ["Day", "Task", "Owner", "Status", "Deliverable"],
+        ["Mon Aug 20", "SSM incorporation filing (private-limited)", "Founder", "📋 Planned", "Incorporation submitted"],
+        ["Mon Aug 20", "Join 5 target groups (AI Malaysia, MFG Ops, etc.)", "Founder", "📋 Planned", "5 groups joined"],
+        ["Tue Aug 21", "PENSOLAR Demo Scenario 2 (schedule optimization)", "AI Co-pilot", "📋 Planned", "Demo script v2"],
+        ["Wed Aug 22", "Survey clients #1 (mfg) + #2 (retail)", "Founder", "📋 Planned", "2 survey responses"],
+        ["Thu Aug 23", "Low-fid mockup of PENSOLAR UX", "Founder + AI", "📋 Planned", "Mockup PNG + wireframes"],
+        ["Fri Aug 24", "Client survey #3 (F&B) + response analysis", "Founder", "📋 Planned", "3 responses collected"],
+        ["Fri Aug 24", "Draft 3 demo scenarios documented", "AI Co-pilot", "📋 Planned", "Scenario doc v1"],
+        ["Sat Aug 25", "Notion workspace setup (project mgmt + KB)", "Founder", "📋 Planned", "Notion workspace live"],
+        ["Sun Aug 26", "COO Brief W4 + Week 3 review", "AI Co-pilot", "📋 Planned", "coo-brief-2026-W34.md"],
+    ]
+    story.append(Paragraph("Focus: Complete SSM incorporation, validate PENSOLAR demos, set up Notion. "
+                          "Bank account opens once SSM receipt lands.", styles["BodySmall_big"]))
+    story.append(Spacer(1, 4*mm))
+    story.append(big_status_table(next_week_rows, col_widths=[20*mm, 45*mm, 25*mm, 15*mm, 45*mm]))
     
     return story
 
 def build_business_model():
-    """Section 03: Business Model — VTDF framework adapted for AI consulting."""
+    """Section 05: Business Model — VTDF framework."""
     story = []
-    story += section_header("03", "Business Model", "VTDF framework: Value, Tech, Distribution, Finance")
+    story += section_header_big("05", "Business Model", "VTDF framework: Value, Tech, Distribution, Finance")
     
     story.append(Paragraph(
         "Adapted from the VTDF (Value-Technology-Distribution-Finance) framework for AI "
-        "consulting services. Unlike pure SaaS plays (e.g. C3.ai), OAKAI is positioned as "
-        "a solution provider: the product is implemented AI systems, not licensed software.",
-        styles["Body"]
+        "consulting services. Unlike pure SaaS plays (e.g. C3.ai at $5B ARR with 70-75% "
+        "subscription revenue), OAKAI is positioned as a solution provider: the product is "
+        "implemented AI systems, not licensed software.",
+        styles["Body_big"]
     ))
     
     story.append(Spacer(1, 6*mm))
+    story += section_header_h2("05A", "Value Proposition", "What clients buy")
     
-    # Value Proposition
-    story += section_header("03A", "Value Proposition", "What clients buy")
     vp_rows = [
         ["Value Driver", "Client Benefit", "Evidence"],
         ["Operational Excellence", "Reduce waste, variation, and delay in core workflows",
-         "7 Pillars framework validated in PENSOLAR case"],
+         "7 Pillars framework (6Sigma.us) validated in PENSOLAR case"],
         ["AI-Augmented Decision Making", "Real-time exception detection + recommendation engine",
          "Qwen2.5-1.5B serving anomaly-flagging demo for solar PM"],
         ["Risk-Gated Autonomy", "AI systems that can act, but stop at the right risk threshold",
@@ -132,12 +310,12 @@ def build_business_model():
         ["Evals-Based Trust", "Every AI capability measured against frozen golden sets",
          "golden_v1.csv + score_eval.py: recall gate on guardrails"],
     ]
-    story.append(status_table(vp_rows, col_widths=[40*mm, 50*mm, 60*mm]))
+    story.append(big_status_table(vp_rows, col_widths=[40*mm, 55*mm, 55*mm]))
     
     story.append(Spacer(1, 8*mm))
     
     # Technology Stack
-    story += section_header("03B", "Technology Stack", "The AI backbone stack")
+    story += section_header_h2("05B", "Technology Stack", "The AI backbone stack")
     
     stack_rows = [
         ["Layer", "Component", "Provider", "Cost Tier"],
@@ -150,12 +328,12 @@ def build_business_model():
         ["Orchestration", "Hermes Agent + cron jobs", "Local s6 + gateway", "Free"],
         ["Storage", "SQLite state.db + git version control", "Local + GitHub", "Free"],
     ]
-    story.append(status_table(stack_rows, col_widths=[20*mm, 45*mm, 40*mm, 30*mm]))
+    story.append(big_status_table(stack_rows, col_widths=[20*mm, 45*mm, 40*mm, 30*mm]))
     
     story.append(Spacer(1, 8*mm))
     
     # Revenue Model
-    story += section_header("03C", "Revenue Model", "Path to paid services")
+    story += section_header_h2("05C", "Revenue Model", "Path to paid services")
     revenue_rows = [
         ["Stream", "Model", "When"],
         ["AI Consulting (POC)", "Fee-for-deliverable: POC builds, eval design, guardrail setup", "Weeks 1-8"],
@@ -163,27 +341,29 @@ def build_business_model():
         ["Knowledge Products", "Templates, frameworks, golden-set scaffolding sold as packages", "Q1 2027"],
         ["Training Programs", "Workshop: mental-model AI for operations teams", "Q2 2027"],
     ]
-    story.append(status_table(revenue_rows, col_widths=[40*mm, 55*mm, 30*mm]))
+    story.append(big_status_table(revenue_rows, col_widths=[35*mm, 55*mm, 30*mm]))
     
     story.append(Spacer(1, 6*mm))
     story.append(Paragraph(
         "<b>Unit economics target:</b> LTV:CAC > 3:1, gross margin > 70%, payback period < 90 days. "
-        "First 3 client POCs will be at reduced rate to build case studies.",
-        styles["BodySmall"]
+        "First 3 client POCs will be at reduced rate to build case studies. "
+        "Enterprise AI consulting typically commands $2k-8k/day for senior talent; "
+        "our free-tier leverage target is 40% lower cost at equivalent quality.",
+        styles["BodySmall_big"]
     ))
     
     return story
 
 def build_coo_roadmap():
-    """Section 04: COO-Guided Roadmap."""
+    """Section 06: COO-Guided Roadmap + Risk Mitigation."""
     story = []
-    story += section_header("04", "COO Roadmap", "Week-by-week execution plan")
+    story += section_header_big("06", "COO Roadmap", "Week-by-week execution plan")
     
     story.append(Paragraph(
         "The COO guidance (produced by the <i>strategic-coo-guidance</i> cron every Sunday 08:00 MYT) "
         "frames execution in 3-stream parallel sprints. Each week has a legal/marketing/product stream, "
         "with success metrics tied to measurable outcomes.",
-        styles["Body"]
+        styles["Body_big"]
     ))
     
     story.append(Spacer(1, 4*mm))
@@ -196,55 +376,50 @@ def build_coo_roadmap():
         ["W4", "NDA template + COO Brief package", "Group engagement 15+ posts", "Local LLM integration validated", "First client demo tested"],
         ["W5-W8", "Client contract templates", "Case study content pipeline", "Client POC #1 (real engagement)", "First paid POC signed"],
     ]
-    story.append(status_table(roadmap_rows, col_widths=[15*mm, 25*mm, 35*mm, 35*mm, 40*mm]))
+    story.append(big_status_table(roadmap_rows, col_widths=[15*mm, 25*mm, 40*mm, 30*mm, 40*mm]))
     
     story.append(Spacer(1, 8*mm))
     
     # Risk mitigation
-    story += section_header("04A", "Risk Mitigation", "Proactive threat coverage")
+    story += section_header_h2("06A", "Risk Mitigation", "Proactive threat coverage")
     risk_rows = [
         ["Risk", "Impact", "Probability", "Mitigation"],
         ["Egress blocked (HF DNS, Groq WAF)", "H", "H", "Local-first stack: Qwen2.5-1.5B + bge-m3"],
-        ["Free-tier throttled (Nous ~50RPM, OR 50/day)", "M", "H", "Batch off-line; local LLM is primary"],
+        ["Free-tier throttled (Nous ~50RPM)", "M", "H", "Batch off-line; local LLM is primary"],
         ["SSM name rejection", "H", "M", "3 names filed simultaneously"],
-        ["No client responds to survey", "M", "M", "Lead with personal network + RM20 incentive each"],
-        ["LinkedIn shadow-ban", "L", "M", "Human-first posting, spaced cadence, no hashtag spam"],
-        ["Bank account delay", "H", "M", "Prep packet day 4; founder personal bridge account tagged"],
+        ["No client responds to survey", "M", "M", "Lead with personal network + RM20 incentive"],
+        ["LinkedIn shadow-ban", "L", "M", "Human-first posting, spaced cadence"],
+        ["Bank account delay", "H", "M", "Prep packet day 4; founder bridge account tagged"],
     ]
-    story.append(status_table(risk_rows, col_widths=[50*mm, 18*mm, 20*mm, 62*mm]))
+    story.append(big_status_table(risk_rows, col_widths=[48*mm, 16*mm, 18*mm, 68*mm]))
     
     story.append(Spacer(1, 8*mm))
     
     # Success metrics
-    story += section_header("04B", "Success Metrics", "Week 1 targets (gate: pass/fail)")
+    story += section_header_h2("06B", "Success Metrics", "Week 2 targets (gate: pass/fail)")
     metrics_rows = [
         ["Metric", "Baseline", "Target", "Signal"],
-        ["Company status", "Unnamed", "SSM receipt issued", "Green = A1+A2 started"],
-        ["Domain", "Unregistered", "Paid + DNS configured", "Green = A3 done"],
-        ["Bank account", "None", "Prep packet complete", "Green = A4 done; open = W2"],
-        ["LinkedIn followers", "0", "30+", "Green ≥ 30"],
-        ["Client surveys", "0", "3 (mfg/retail/F&B)", "Green = C1 done"],
-        ["Local LLM scaffold", "None", "Running inference", "Green = C5 done"],
-        ["W1 cash spent", "—", "≤ RM215 core", "Budget held"],
+        ["SSM name filed", "Not filed", "3 names filed on e-Lodgement", "Green = confirmation email received"],
+        ["Domain registered", "Unregistered", "oakai.com.my paid + DNS", "Green = registrar receipt"],
+        ["LinkedIn live", "Drafted", "Profile + Day-1 post live", "Green = vanity URL working"],
+        ["Landing page", "None", "GitHub Pages deployed with UTM", "Green = URL accessible"],
+        ["Survey outreach", "0", "3 clients contacted", "Green = 1 response"],
+        ["Demo scenario 1", "Scaffolded", "Script + mockup drafted", "Green = runnable on local LLM"],
+        ["COO Brief W3", "Pending", "coo-brief-2026-W33.md delivered", "Green = cron auto-generates"],
     ]
-    story.append(status_table(metrics_rows, col_widths=[30*mm, 25*mm, 30*mm, 40*mm]))
-    
-    story.append(Paragraph(
-        "Pass threshold: A1+A2+A3 landed, C5 scaffold running, 1 survey done, Day-1 post live, 30+ followers.",
-        styles["BodySmall"]
-    ))
+    story.append(big_status_table(metrics_rows, col_widths=[30*mm, 22*mm, 30*mm, 40*mm]))
     
     return story
 
 def build_technology_foundation():
-    """Section 05: Technology Foundation — how the AI stack works."""
+    """Section 07: Technology Foundation."""
     story = []
-    story += section_header("05", "Technology Foundation", "The AI backbone in practice")
+    story += section_header_big("07", "Technology Foundation", "The AI backbone in practice")
     
     story.append(Paragraph(
         "The OAKAI AI stack consists of five layers, each chosen for cost-free operation "
         "while maintaining production viability:",
-        styles["Body"]
+        styles["Body_big"]
     ))
     
     story.append(Spacer(1, 4*mm))
@@ -257,11 +432,11 @@ def build_technology_foundation():
         ["Guardrail Layer", "model-selection-policy skill", "Free-first routing, approval gates, cost control"],
         ["Eval Layer", "golden_v1.csv + score_eval.py", "Precision/recall, recall-gated rollout"],
     ]
-    story.append(status_table(layer_rows, col_widths=[25*mm, 50*mm, 85*mm]))
+    story.append(big_status_table(layer_rows, col_widths=[25*mm, 50*mm, 85*mm]))
     
     story.append(Spacer(1, 8*mm))
     
-    story.append(Paragraph("Key architectural decisions:", styles["H3"]))
+    story.append(Paragraph("Key architectural decisions:", styles["H2_big"]))
     
     architecture_rows = [
         ["Decision", "Choice", "Rationale"],
@@ -271,12 +446,12 @@ def build_technology_foundation():
         ["State protection", "state.db gitignored + pre-commit hook blocks commits", "Prevents Aug 12 race-condition corruption"],
         ["Gateway", "s6-managed gateway service", "Auto-restart on crash; notifications via messaging platforms"],
     ]
-    story.append(status_table(architecture_rows, col_widths=[40*mm, 50*mm, 65*mm]))
+    story.append(big_status_table(architecture_rows, col_widths=[38*mm, 48*mm, 64*mm]))
     
     story.append(Spacer(1, 8*mm))
     
     # Autonomous systems
-    story += section_header("05A", "Autonomous Systems", "Six parallel cron streams")
+    story += section_header_h2("07A", "Autonomous Systems", "Six parallel cron streams")
     
     cron_rows = [
         ["Cron Job", "Schedule", "Deliverable"],
@@ -287,52 +462,51 @@ def build_technology_foundation():
         ["workspace-cleanup-daily", "02:00 MYT", "14-day retention pruning"],
         ["startup-catchup-enforcement", "06:00 MYT daily", "Auto-enforce startup checks + catchup"],
     ]
-    story.append(status_table(cron_rows, col_widths=[35*mm, 30*mm, 85*mm]))
+    story.append(big_status_table(cron_rows, col_widths=[35*mm, 30*mm, 85*mm]))
     
     return story
 
 def build_governance():
-    """Section 06: Governance & Controls."""
+    """Section 08: Governance & Controls."""
     story = []
-    story += section_header("06", "Governance & Controls", "How safety and quality are enforced")
+    story += section_header_big("08", "Governance & Controls", "How safety and quality are enforced")
     
     story.append(Paragraph(
         "Three layers of defense ensure quality output and safe operation. These are "
         "not aspirational — they are implemented and verified in the current stack:",
-        styles["Body"]
+        styles["Body_big"]
     ))
     
     story.append(Spacer(1, 6*mm))
     
-    story += section_header("06A", "Approval Gate", "Before paid API calls")
+    story += section_header_h2("08A", "Approval Gate", "Before paid API calls")
     story.append(Paragraph(
         "The <i>model-selection-policy</i> skill enforces free-first routing. Paid models "
         "(Gemini, DeepSeek direct) require explicit founder approval. The routing chain: "
         "Nous Portal → OpenRouter → NVIDIA NIM → Paid (approval-gated).",
-        styles["Body"]
+        styles["Body_big"]
     ))
     
-    story += section_header("06B", "Eval Gate", "Before trusting AI output")
+    story += section_header_h2("08B", "Eval Gate", "Before trusting AI output")
     story.append(Paragraph(
         "Every AI tool is evaluated against frozen, stratified golden sets "
         "(golden_v1.csv, 20 rows, 25% block cases). Precision/recall/accuracy reported. "
         "Recall is the gate for guardrails — accuracy is the last number reported, not the first.",
-        styles["Body"]
+        styles["Body_big"]
     ))
     
-    story += section_header("06C", "Autonomy Gate", "Safe AI action in production")
+    story += section_header_h2("08C", "Autonomy Gate", "Safe AI action in production")
     story.append(Paragraph(
         "Shadow → Canary → Enforce rollout: shadow (advisory, human decides) → "
         "canary (low-risk auto-approval) → enforce (full autonomy). "
         "Auto-rollback to dial 0 if recall drops below threshold on any block case.",
-        styles["Body"]
+        styles["Body_big"]
     ))
     
     story.append(Spacer(1, 8*mm))
     
     # Compliance checklist
-    story += section_header("06D", "Weekly Compliance Checklist", "Must-pass before closing the week")
-    
+    story += section_header_h2("08D", "Weekly Compliance Checklist", "Must-pass before closing the week")
     checklist_items = [
         "state.db healthy (sessions > 0, integrity check PASS)",
         "Gateway service running (s6 supervision, auto-restart enabled)",
@@ -343,37 +517,38 @@ def build_governance():
         "Free-tier quotas not exhausted (Nous < 50RPM, OR < 50/day)",
         "Egress blockers confirmed (HF DNS still blocked, Groq/WAF still active)",
     ]
-    story += checklist(checklist_items)
+    story += checklist_big(checklist_items)
     
     return story
 
 def build_financial_snapshot():
-    """Section 07: Financial Snapshot."""
+    """Section 09: Financial Snapshot."""
     story = []
-    story += section_header("07", "Financial Snapshot", "Bootstrap economics + W1 budget")
+    story += section_header_big("09", "Financial Snapshot", "Bootstrap economics + W2 budget")
     
     budget_rows = [
         ["Item", "Cost (RM)", "Tier", "Status"],
-        ["SSM name reservation", "30", "Core", "Pending"],
-        ["SSM incorporation (private limited)", "110", "Core", "Pending"],
-        ["Domain oakai.com.my (1yr)", "15", "Core", "Pending"],
-        ["Survey incentive (3 clients)", "60", "Core", "Pending"],
+        ["SSM name reservation", "30", "Core", "📋 Pending"],
+        ["SSM incorporation (private limited)", "110", "Core", "📋 Pending"],
+        ["Domain oakai.com.my (1yr)", "15", "Core", "📋 Pending"],
+        ["Survey incentive (3 clients)", "60", "Core", "📋 Planned"],
         ["<b>Subtotal core</b>", "<b>215</b>", "", ""],
-        ["Contingency buffer", "45", "Optional", "Pending"],
+        ["Contingency buffer", "45", "Optional", "📋 Pending"],
         ["LinkedIn Premium (W2)", "—", "Deferred", "Deferred"],
         ["Paid APIs (W1+)", "—", "Approval-gated", "Not used"],
-        ["<b>W1 cash max</b>", "<b>260</b>", "Core + buffer", "Cap"],
+        ["<b>W2 cash max</b>", "<b>215</b>", "Core only", "Cap"],
     ]
-    story.append(status_table(budget_rows, col_widths=[50*mm, 20*mm, 35*mm, 30*mm]))
+    story.append(big_status_table(budget_rows, col_widths=[50*mm, 20*mm, 35*mm, 30*mm]))
     
     story.append(Spacer(1, 8*mm))
     
-    story.append(kv_callout_box("Key Constraint", [
+    story.append(kv_callout_box_big("Key Constraint", [
         "Egress reality: HF DNS-blocked, Groq/Cerebras behind Cloudflare WAF. "
         "All dev/POC runs on local stack. Cloud AI only via approved free tiers.",
         "Free-tier AI (Nous Portal ~50RPM, OpenRouter 50/day) + local Qwen2.5-1.5B "
-        "cover all W1 synthesis, copy, and contract drafting. "
-        "No paid LLM call is made without founder approval."
+        "cover all synthesis, copy, and contract drafting. "
+        "No paid LLM call is made without founder approval.",
+        "Unit economics target: LTV:CAC > 3:1, gross margin > 70%, payback < 90 days."
     ]))
     
     return story
@@ -389,37 +564,47 @@ def build_mission_document(out_path):
     story.append(PageBreak())
     
     # Section 02
-    story += build_mvp_and_market()
+    story += build_current_status_grid()
     story.append(PageBreak())
     
     # Section 03
-    story += build_business_model()
+    story += build_mvp_and_market()
     story.append(PageBreak())
     
     # Section 04
-    story += build_coo_roadmap()
+    story += build_task_deliverables()
     story.append(PageBreak())
     
     # Section 05
-    story += build_technology_foundation()
+    story += build_business_model()
     story.append(PageBreak())
     
     # Section 06
-    story += build_governance()
+    story += build_coo_roadmap()
     story.append(PageBreak())
     
     # Section 07
+    story += build_technology_foundation()
+    story.append(PageBreak())
+    
+    # Section 08
+    story += build_governance()
+    story.append(PageBreak())
+    
+    # Section 09
     story += build_financial_snapshot()
     
-    # TOC (estimate page numbers — two-pass correction in SKILL.md)
+    # TOC
     toc_entries = [
         ("01", "Executive Summary", "3"),
-        ("02", "MVP & Market", "4"),
-        ("03", "Business Model", "5"),
-        ("04", "COO Roadmap", "7"),
-        ("05", "Technology Foundation", "9"),
-        ("06", "Governance & Controls", "11"),
-        ("07", "Financial Snapshot", "13"),
+        ("02", "Current Status Grid", "4"),
+        ("03", "MVP & Market", "5"),
+        ("04", "Task Deliverables", "6"),
+        ("05", "Business Model", "8"),
+        ("06", "COO Roadmap", "10"),
+        ("07", "Technology Foundation", "12"),
+        ("08", "Governance & Controls", "14"),
+        ("09", "Financial Snapshot", "16"),
     ]
     
     result_path = build_document(
@@ -441,15 +626,15 @@ if __name__ == "__main__":
     path = build_mission_document(out)
     page_count = 0
     try:
-        import fitz
+        import pymupdf as fitz
         doc = fitz.open(path)
         page_count = doc.page_count
         doc.close()
     except:
-        page_count = "~14"
+        page_count = "~16"
     
     print(f"✓ Generated: {path}")
-    print(f"  Type: OAKAI Mission Executive Brief")
+    print(f"  Type: OAKAI Mission Executive Brief (Enhanced)")
     print(f"  Pages: {page_count}")
     print(f"  Classification: {DOC_CLASSIFICATION}")
     print(f"  Reference: {DOC_REF}")
