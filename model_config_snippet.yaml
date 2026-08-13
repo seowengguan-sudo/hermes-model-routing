@@ -1,0 +1,58 @@
+# ============================================================================
+# MODEL CONFIG SNIPPET — REVIEW ONLY (NOT yet applied to /opt/data/config.yaml)
+# Generated to match models_sequence.json free-first policy.
+# Apply only after user approval: merge into config.yaml `model:` / `auxiliary:`.
+# ============================================================================
+
+model:
+  # Main loop — FREE-FIRST chain. hy3 first; falls back on exhaustion (agent edits
+  # this for next session). Paid NEVER auto-selected.
+  default: tencent/hy3:free
+  provider: nous            # hy3 routes via Nous Portal (20RPM/500TPM)
+
+auxiliary:
+  # Each category: free-first. Paid fallback exists in models_sequence.json but is
+  # GATED — agent asks approval before using it. This YAML sets the free default only.
+  vision:
+    provider: openrouter
+    model: nvidia/nemotron-nano-12b-v2-vl:free
+  mcp:
+    provider: openrouter
+    model: poolside/laguna-s-2.1:free
+  skill_hub:
+    provider: nous
+    model: tencent/hy3:free
+  approval:
+    provider: nous
+    model: tencent/hy3:free
+  web_extract:
+    provider: nous
+    model: tencent/hy3:free
+  compression:
+    provider: nous
+    model: tencent/hy3:free
+  title_generation:
+    provider: nous
+    model: tencent/hy3:free
+  triage_specifier:
+    provider: openrouter
+    model: poolside/laguna-xs-2.1:free
+  kanban_decomposer:
+    provider: nous
+    model: tencent/hy3:free
+  curator:
+    provider: nous
+    model: tencent/hy3:free
+  profile_describer:
+    provider: nous
+    model: tencent/hy3:free
+
+# ----------------------------------------------------------------------------
+# PAID FALLBACKS (gated, NOT set here — agent proposes + asks approval per task):
+#   vision      -> gemini-3.5-flash        (approval)
+#   mcp         -> deepseek-v4-flash       (approval)   [NEVER deepseek-v4-pro]
+#   skill_hub   -> stepfun/step-3.7-flash  (approval)
+#   approval    -> gemini-2.5-flash        (approval)
+#   web_extract -> deepseek-v4-flash       (approval)
+# DeepSeek rule: v4-flash only. v4-pro requires explicit user approval.
+# ----------------------------------------------------------------------------
