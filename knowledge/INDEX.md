@@ -19,3 +19,6 @@ Compact map. Agent reads full files on demand; this stays in active memory.
 - `mentor-ai-daily` — 07:00 + 19:00 UTC (15:00 + 03:00 MYT), hy3, teaches ONE concept + tests student; writes SUMMARY+RUN_LOG (no dup)
 - `learn-pensolar` — 07:00 UTC (15:00 MYT), hy3, reads SUMMARY→find gaps→searches only gaps→rewrites SUMMARY (no dup)
 - Both: SUMMARY ≤32KB (hard cap; halt on breach), deliver=local
+
+## Methodology (Agent Knowledge)
+- `productivity/deep-research-methodology/` — 5-layer research-to-code framework, verification patterns, pitfall catalog (Aug 12 incident, ReportLab API, skill duplication, egress awareness). USE BEFORE EVERY SUBSTANTIVE TASK.
