@@ -20,5 +20,15 @@ Compact map. Agent reads full files on demand; this stays in active memory.
 - `learn-pensolar` — 07:00 UTC (15:00 MYT), hy3, reads SUMMARY→find gaps→searches only gaps→rewrites SUMMARY (no dup)
 - Both: SUMMARY ≤32KB (hard cap; halt on breach), deliver=local
 
-## Methodology (Agent Knowledge)
-- `productivity/deep-research-methodology/` — 5-layer research-to-code framework, verification patterns, pitfall catalog (Aug 12 incident, ReportLab API, skill duplication, egress awareness). USE BEFORE EVERY SUBSTANTIVE TASK.
+## Skills (Agent Capabilities)
+- `PDF/` — OAKAI-branded professional PDF reports (high-contrast teal-gold palette, cover/TOC/footer, build_document API). PRIMARY for executive reports
+- `productivity/pdf-from-stdlib/` — Pure Python stdlib PDF writer (no dependencies). Fallback only
+- `productivity/xlsx/` — Excel creation/editing with finance conventions (blue inputs, green links, red external, INDEX/MATCH not XLOOKUP, recalc via LibreOffice)
+- `productivity/powerpoint/` — PowerPoint creation (pptxgenjs), 54 design systems, visual QA pipeline (render→PNG→vision_analyze)
+- `productivity/docx/` — Word documents with tracked changes, comments, templates
+- `creative/claude-design` — Design process + taste for one-off HTML artifacts
+- `creative/popular-web-designs` — 54 brand design systems (Stripe, Linear, Vercel, etc.)
+- `creative/architecture-diagram` — SVG cloud/infra diagrams (dark-themed)
+- `productivity/professional-doc-deliverables/` — Excel/PDF/diagram deliverables (reportlab + openpyxl)
+- `productivity/professional-doc-generation/SKILL.md` — Unified cross-format skill: format selection matrix, workflow, verification, pitfalls
+- `productivity/deep-research-methodology/` — 5-layer research-to-code framework, verification patterns, pitfall catalog
