@@ -398,17 +398,17 @@ def build_task_deliverables():
     
     this_week_rows = [
         ["Day", "Task", "Owner", "Status", "Deliverable"],
-        ["Mon Aug 13", "SSM name reservation (3 names via e-Lodgement)", "EG SEOW", "📋 Planned", "SSM receipt number"],
-        ["Mon Aug 13", "Publish LinkedIn Day-1 post + claim vanity URL", "EG SEOW", "🔄 Drafted", "linkedin.com/in/oakai-asia live"],
-        ["Tue Aug 14", "Secure domain oakai.com.my (MYNIC registrar)", "EG SEOW", "📋 Planned", "Domain registered + DNS"],
-        ["Tue Aug 14", "Draft landing page copy (Day-2 post + case hook)", "AI Co-pilot", "📋 Planned", "Landing page content v1"],
-        ["Wed Aug 15", "Mid-week checkpoint (W2 pulse)", "All", "📋 Planned", "Checkpoint report via cron"],
-        ["Thu Aug 16", "Week 1 retrospective + W2 COO Brief", "AI Co-pilot", "📋 Planned", "coo-brief-2026-W33.md"],
-        ["Thu Aug 16", "3 client survey outreach (launch)", "EG SEOW", "📋 Planned", "3 survey responses targeted"],
-        ["Fri Aug 17", "PENSOLAR Demo Scenario 1 (anomaly detection)", "AI Co-pilot", "📋 Planned", "Demo script + mockup"],
-        ["Fri Aug 17", "Local LLM integration validated", "Ops", "📋 Planned", "Qwen2.5-1.5B inference verified"],
-        ["Sat Aug 18", "GitHub Pages landing site deployed", "AI Co-pilot", "📋 Planned", "Live URL + UTM tracked"],
-        ["Sun Aug 19", "COO Brief W3 delivered", "AI Co-pilot", "📋 Planned", "coo-brief-2026-W33.md published"],
+        ["Thu Aug 13", "SSM name reservation (3 names via e-Lodgement)", "EG SEOW", "📋 Planned", "SSM receipt number"],
+        ["Thu Aug 13", "Publish LinkedIn Day-1 post + claim vanity URL", "EG SEOW", "🔄 Drafted", "linkedin.com/in/oakai-asia live"],
+        ["Fri Aug 14", "Secure domain oakai.com.my (MYNIC registrar)", "EG SEOW", "📋 Planned", "Domain registered + DNS"],
+        ["Fri Aug 14", "Draft landing page copy (Day-2 post + case hook)", "AI Co-pilot", "📋 Planned", "Landing page content v1"],
+        ["Sat Aug 15", "Mid-week checkpoint (W2 pulse)", "All", "📋 Planned", "Checkpoint report via cron"],
+        ["Sun Aug 16", "Week 1 retrospective + W2 COO Brief", "AI Co-pilot", "📋 Planned", "coo-brief-2026-W33.md"],
+        ["Sun Aug 16", "3 client survey outreach (launch)", "EG SEOW", "📋 Planned", "3 survey responses targeted"],
+        ["Mon Aug 17", "PENSOLAR Demo Scenario 1 (anomaly detection)", "AI Co-pilot", "📋 Planned", "Demo script + mockup"],
+        ["Mon Aug 17", "Local LLM integration validated", "Ops", "📋 Planned", "Qwen2.5-1.5B inference verified"],
+        ["Tue Aug 18", "GitHub Pages landing site deployed", "AI Co-pilot", "📋 Planned", "Live URL + UTM tracked"],
+        ["Wed Aug 19", "COO Brief W3 delivered", "AI Co-pilot", "📋 Planned", "coo-brief-2026-W33.md published"],
     ]
     story.append(Paragraph("Critical path: SSM name must be reserved before bank account can open. "
                           "Domain + LinkedIn must be live for landing page.", styles["BodySmall_big"]))
@@ -422,15 +422,15 @@ def build_task_deliverables():
     
     next_week_rows = [
         ["Day", "Task", "Owner", "Status", "Deliverable"],
-        ["Mon Aug 20", "SSM incorporation filing (private-limited)", "EG SEOW", "📋 Planned", "Incorporation submitted"],
-        ["Mon Aug 20", "Join 5 target groups (AI Malaysia, MFG Ops, etc.)", "EG SEOW", "📋 Planned", "5 groups joined"],
-        ["Tue Aug 21", "PENSOLAR Demo Scenario 2 (schedule optimization)", "AI Co-pilot", "📋 Planned", "Demo script v2"],
-        ["Wed Aug 22", "Survey clients #1 (mfg) + #2 (retail)", "EG SEOW", "📋 Planned", "2 survey responses"],
-        ["Thu Aug 23", "Low-fid mockup of PENSOLAR UX", "EG SEOW + AI", "📋 Planned", "Mockup PNG + wireframes"],
-        ["Fri Aug 24", "Client survey #3 (F&B) + response analysis", "EG SEOW", "📋 Planned", "3 responses collected"],
-        ["Fri Aug 24", "Draft 3 demo scenarios documented", "AI Co-pilot", "📋 Planned", "Scenario doc v1"],
-        ["Sat Aug 25", "Notion workspace setup (project mgmt + KB)", "EG SEOW", "📋 Planned", "Notion workspace live"],
-        ["Sun Aug 26", "COO Brief W4 + Week 3 review", "AI Co-pilot", "📋 Planned", "coo-brief-2026-W34.md"],
+        ["Thu Aug 20", "SSM incorporation filing (private-limited)", "EG SEOW", "📋 Planned", "Incorporation submitted"],
+        ["Thu Aug 20", "Join 5 target groups (AI Malaysia, MFG Ops, etc.)", "EG SEOW", "📋 Planned", "5 groups joined"],
+        ["Fri Aug 21", "PENSOLAR Demo Scenario 2 (schedule optimization)", "AI Co-pilot", "📋 Planned", "Demo script v2"],
+        ["Sat Aug 22", "Survey clients #1 (mfg) + #2 (retail)", "EG SEOW", "📋 Planned", "2 survey responses"],
+        ["Sun Aug 23", "Low-fid mockup of PENSOLAR UX", "EG SEOW + AI", "📋 Planned", "Mockup PNG + wireframes"],
+        ["Mon Aug 24", "Client survey #3 (F&B) + response analysis", "EG SEOW", "📋 Planned", "3 responses collected"],
+        ["Mon Aug 24", "Draft 3 demo scenarios documented", "AI Co-pilot", "📋 Planned", "Scenario doc v1"],
+        ["Tue Aug 25", "Notion workspace setup (project mgmt + KB)", "EG SEOW", "📋 Planned", "Notion workspace live"],
+        ["Wed Aug 26", "COO Brief W4 + Week 3 review", "AI Co-pilot", "📋 Planned", "coo-brief-2026-W34.md"],
     ]
     story.append(Paragraph("Focus: Complete SSM incorporation, validate PENSOLAR demos, set up Notion. "
                           "Bank account opens once SSM receipt lands.", styles["BodySmall_big"]))
