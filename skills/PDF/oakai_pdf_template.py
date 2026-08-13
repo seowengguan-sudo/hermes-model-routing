@@ -27,12 +27,14 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.enums import TA_LEFT, TA_JUSTIFY
+from reportlab.lib.enums import TA_LEFT, TA_JUSTIFY, TA_CENTER
 from reportlab.platypus import (
     BaseDocTemplate, PageTemplate, Frame, Paragraph, Spacer, Table,
-    TableStyle, NextPageTemplate, PageBreak, KeepTogether, HRFlowable
+    TableStyle, NextPageTemplate, PageBreak, KeepTogether, HRFlowable,
+    KeepInFrame
 )
 from reportlab.pdfgen import canvas
+from reportlab.lib.utils import simpleSplit
 
 # ----------------------------------------------------------------------
 # BRAND PALETTE — change these 6 lines to re-skin every document at once
@@ -173,6 +175,125 @@ def make_toc(entries):
         ("ALIGN", (2, 0), (2, -1), "RIGHT"),
     ]))
     return tbl
+
+
+# ----------------------------------------------------------------------
+# LAYOUT OPTIMIZATION HELPERS — maximize page fill, minimize waste
+# ----------------------------------------------------------------------
+
+def auto_split_paragraph(text, style, max_width):
+    """Split long text into paragraphs that fit within max_width.
+    Returns a string with <br/> tags at word-wrap boundaries.
+    Call this before wrapping text for narrow table cells."""
+    # Use reportlab's built-in text wrapping
+    from reportlab.lib.utils import simpleSplit
+    font_name = style.fontName or "Helvetica"
+    font_size = style.fontSize or 10
+    # Get the actual font to measure properly
+    from reportlab.pdfbase import pdfmetrics
+    try:
+        font = pdfmetrics.getFont(font_name)
+        avg_char_width = font.face.width * font_size / 1000.0
+    except Exception:
+        avg_char_width = font_size * 0.5
+    chars_per_line = int(max_width / avg_char_width) if avg_char_width > 0 else 40
+    if chars_per_line < 10:
+        chars_per_line = 10
+    
+    lines = simpleSplit(text, font_name, font_size, max_width * mm if max_width < 100 else max_width, 
+                        max_width * 0.6 if max_width < 100 else None)
+    # simpleSplit returns lines based on width; if it doesn't work, fallback to manual splitting
+    if isinstance(lines, list) and len(lines) > 1:
+        return "<br/>".join(lines)
+    
+    # Fallback: simple character-based splitting
+    words = text.split()
+    result_lines = []
+    current = ""
+    for word in words:
+        if len(current) + len(word) + 1 <= chars_per_line:
+            current += " " + word if current else word
+        else:
+            if current:
+                result_lines.append(current)
+            current = word
+    if current:
+        result_lines.append(current)
+    return "<br/>".join(result_lines)
+
+
+def fit_table_to_page(rows, col_widths, max_height=None, style_overrides=None):
+    """Wraps a Table in KeepInFrame to ensure it fits on page.
+    
+    If the table is too wide, columns are auto-shrunk proportionally.
+    If the table is too tall, it's constrained to max_height.
+    
+    Usage:
+        table = fit_table_to_page(rows, [30*mm, 50*mm, ...], max_height=100*mm)
+        story.append(table)
+    """
+    # Build the table
+    header = [Paragraph(str(c), styles["CellHead"]) for c in rows[0]]
+    data = [header]
+    for r in rows[1:]:
+        data.append([Paragraph(str(c), styles["Cell"]) for c in r])
+    
+    # Adjust column widths if total exceeds page width
+    page_content_width = PAGE_W - 2 * MARGIN
+    total_requested = sum(col_widths)
+    if total_requested > page_content_width:
+        # Scale down proportionally
+        scale_factor = page_content_width / total_requested
+        col_widths = [w * scale_factor for w in col_widths]
+    
+    t = Table(data, colWidths=col_widths, repeatRows=1, hAlign='LEFT')
+    
+    # Default table style (full professional borders)
+    table_style = [
+        ("BACKGROUND", (0, 0), (-1, 0), TEAL_DARK),
+        ("TEXTCOLOR", (0, 0), (-1, 0), WHITE),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("TOPPADDING", (0, 0), (-1, -1), 5),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+        ("LEFTPADDING", (0, 0), (-1, -1), 7),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 7),
+        ("LINEBELOW", (0, 0), (-1, 0), 1.0, TEAL_DARK),
+        ("LINEBELOW", (0, 1), (-1, -1), 0.5, BORDER),
+        ("LINEABOVE", (0, 1), (-1, 1), 0.5, BORDER),
+        ("LINELEFT", (0, 0), (0, -1), 0.5, BORDER),
+        ("LINERIGHT", (-1, 0), (-1, -1), 0.5, BORDER),
+    ]
+    
+    # Zebra striping
+    for i in range(1, len(data)):
+        if i % 2 == 0:
+            table_style.append(("BACKGROUND", (0, i), (-1, i), ROW_ALT))
+    
+    if style_overrides:
+        table_style.extend(style_overrides)
+    
+    t.setStyle(TableStyle(table_style))
+    
+    if max_height:
+        return KeepInFrame(max_height, page_content_width * 0.9, [t], mode='shrink')
+    return t
+
+
+def split_large_table(rows, col_widths, max_rows_per_table=15):
+    """Split a large table into chunks that fit well on pages.
+    Returns a list of Table flowables.
+    
+    This prevents tables from spanning 3+ pages uncontrollably.
+    Each chunk includes the header row."""
+    if len(rows) <= max_rows_per_table:
+        return [status_table(rows, col_widths)]
+    
+    tables = []
+    header = rows[0]
+    for i in range(1, len(rows), max_rows_per_table - 1):
+        chunk = [header] + rows[i:i + max_rows_per_table - 1]
+        tables.append(status_table(chunk, col_widths))
+    return tables
 
 
 # ----------------------------------------------------------------------

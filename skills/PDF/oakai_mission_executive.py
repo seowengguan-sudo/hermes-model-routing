@@ -24,7 +24,8 @@ sys.path.insert(0, '/opt/data/skills/PDF')
 from oakai_pdf_template import (
     build_document, section_header, status_table, checklist,
     kv_callout_box, hr, styles, make_toc, FOOTER_LABEL, BRAND_NAME,
-    TEAL_DARK, TEAL, TEAL_LIGHT, GOLD, CHARCOAL, GREY, ROW_ALT, BORDER, WHITE
+    TEAL_DARK, TEAL, TEAL_LIGHT, GOLD, CHARCOAL, GREY, ROW_ALT, BORDER, WHITE,
+    fit_table_to_page, split_large_table, KeepInFrame
 )
 from reportlab.lib.units import mm
 from reportlab.lib import colors
@@ -413,7 +414,7 @@ def build_task_deliverables():
     story.append(Paragraph("Critical path: SSM name must be reserved before bank account can open. "
                           "Domain + LinkedIn must be live for landing page.", styles["BodySmall_big"]))
     story.append(Spacer(1, 4*mm))
-    story.append(big_status_table(this_week_rows, col_widths=[20*mm, 45*mm, 25*mm, 15*mm, 45*mm]))
+    story.append(fit_table_to_page(this_week_rows, col_widths=[20*mm, 45*mm, 25*mm, 15*mm, 45*mm]))
     
     story.append(Spacer(1, 8*mm))
     
@@ -435,7 +436,8 @@ def build_task_deliverables():
     story.append(Paragraph("Focus: Complete SSM incorporation, validate PENSOLAR demos, set up Notion. "
                           "Bank account opens once SSM receipt lands.", styles["BodySmall_big"]))
     story.append(Spacer(1, 4*mm))
-    story.append(big_status_table(next_week_rows, col_widths=[20*mm, 45*mm, 25*mm, 15*mm, 45*mm]))
+    # Use fit_table_to_page for auto-shrinking columns to fit page width
+    story.append(fit_table_to_page(next_week_rows, col_widths=[20*mm, 45*mm, 25*mm, 15*mm, 45*mm]))
     
     return story
 
