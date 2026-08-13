@@ -64,3 +64,5 @@ ollama_cloud_models_cache.json
 skills/.usage.json.lock
 skills/.bundled_manifest.lock
 sketches.lock
+skills/.usage.json
+skills/.bundled_manifest.lock
