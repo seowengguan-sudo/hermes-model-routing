@@ -33,7 +33,8 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 
 # ── Enhanced styles for larger font sizes ──
-# Use try/except for idempotency (ReportLab styles are global; .add() raises on duplicate)
+# Use try/except for idempotency (ReportLab styles are global;
+# .add() raises on duplicate, and StyleSheet1 doesn't support item assignment on re-run)
 for _name, _style in [
     ("H1_big", ParagraphStyle("H1_big", fontName="Helvetica-Bold", fontSize=22,
         leading=26, textColor=TEAL_DARK, spaceAfter=12)),
@@ -56,8 +57,8 @@ for _name, _style in [
 ]:
     try:
         styles.add(_style)
-    except:
-        styles[_name] = _style
+    except Exception:
+        pass  # Style already exists with correct name; skip
 
 # ── Document metadata ──
 DOC_DATE = "2026-08-13"
