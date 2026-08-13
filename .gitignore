@@ -66,3 +66,7 @@ skills/.bundled_manifest.lock
 sketches.lock
 skills/.usage.json
 skills/.bundled_manifest.lock
+projects.db
+projects.db-shm
+projects.db-wal
+projects.db-journal
