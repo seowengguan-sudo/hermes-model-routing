@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 """
-oakai_mission_executive.py — Generates the OAKAI Mission Executive PDF.
+oakai_mission_executive.py — Generates the OAKAI Mission Executive Brief PDF for EG SEOW.
 
-Enhanced version with:
-- Larger font sizes for better page coverage and readability
-- Task deliverables for this week and next week (table format)
-- Professional layout improvements (bigger tables, more white space control)
-- SSM/domain/bank/Notion/LinkedIn status tracking
-- Updated COO roadmap with current status
+Enhanced with EG SEOW preferences:
+- Professional table borders on ALL content + Gantt + block-flow tables
+- Background color on cover page (already in template, preserved)
+- Color accents + icons on content pages (header/footer bands preserved)
+- Gantt chart for COO roadmap
+- Block flow diagram for technology architecture
+- Name: EG SEOW (corrected from Weng Guan)
+- High-contrast color scheme: teal + gold on dark backgrounds
 
 Run:
     python3 oakai_mission_executive.py
@@ -22,19 +24,25 @@ sys.path.insert(0, '/opt/data/skills/PDF')
 from oakai_pdf_template import (
     build_document, section_header, status_table, checklist,
     kv_callout_box, hr, styles, make_toc, FOOTER_LABEL, BRAND_NAME,
-    TEAL_DARK, TEAL, GOLD, CHARCOAL, GREY, ROW_ALT, BORDER, WHITE
+    TEAL_DARK, TEAL, TEAL_LIGHT, GOLD, CHARCOAL, GREY, ROW_ALT, BORDER, WHITE
 )
 from reportlab.lib.units import mm
 from reportlab.lib import colors
-from reportlab.platypus import Paragraph, Spacer, PageBreak, KeepTogether, Table, TableStyle, PageTemplate, Frame, NextPageTemplate
-from reportlab.lib.enums import TA_LEFT, TA_JUSTIFY
+from reportlab.platypus import (
+    Paragraph, Spacer, PageBreak, KeepTogether, Table, TableStyle,
+    PageTemplate, Frame, NextPageTemplate
+)
+from reportlab.lib.enums import TA_LEFT, TA_JUSTIFY, TA_CENTER
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
+from reportlab.graphics.shapes import Drawing, Rect, String, Group, Ellipse, Line
+from reportlab.graphics.charts.barcharts import VerticalBarChart
+from reportlab.graphics.charts.legends import Legend
 
-# ── Enhanced styles for larger font sizes ──
+# ── Enhanced styles for larger fonts ──
 # Use try/except for idempotency (ReportLab styles are global;
-# .add() raises on duplicate, and StyleSheet1 doesn't support item assignment on re-run)
+# .add() raises on duplicate)
 for _name, _style in [
     ("H1_big", ParagraphStyle("H1_big", fontName="Helvetica-Bold", fontSize=22,
         leading=26, textColor=TEAL_DARK, spaceAfter=12)),
@@ -52,18 +60,16 @@ for _name, _style in [
         leading=15, textColor=TEAL_DARK, spaceAfter=5)),
     ("TaskItem_big", ParagraphStyle("TaskItem_big", fontName="Helvetica", fontSize=10.5,
         leading=15, textColor=CHARCOAL, spaceAfter=4, leftIndent=2)),
-    ("StatusBig", ParagraphStyle("StatusBig", fontName="Helvetica-Bold", fontSize=11,
-        leading=14, alignment=TA_LEFT)),
 ]:
     try:
         styles.add(_style)
     except Exception:
-        pass  # Style already exists with correct name; skip
+        pass  # Style already exists
 
-# ── Document metadata ──
+# ── Document metadata (corrected name) ──
 DOC_DATE = "2026-08-13"
 DOC_CLASSIFICATION = "OAKAI Confidential"
-PREPARED_FOR = "Weng Guan / Founder, OAKAI SDN BHD"
+PREPARED_FOR = "EG SEOW / Founder, OAKAI SDN BHD"
 DOC_TITLE = "OAKAI Mission & Roadmap"
 DOC_SUBTITLE = "Enterprise AI Business Solution Provider — Executive Brief"
 DOC_REF = "OAKAI-MIS-002"
@@ -71,24 +77,32 @@ DOC_REF = "OAKAI-MIS-002"
 PAGE_W, PAGE_H = A4
 MARGIN = 20 * mm
 
-# ── Enhanced table helper with larger fonts ──
+# ── Enhanced table helper with professional borders ──
 def big_status_table(rows, col_widths=None):
-    """Like status_table but with larger fonts for better readability."""
+    """Professional table with full border framework, alternating rows, header branding."""
     header = [Paragraph(str(c), styles["CellHead_big"]) for c in rows[0]]
     data = [header]
     for r in rows[1:]:
         data.append([Paragraph(str(c), styles["Cell_big"]) for c in r])
     t = Table(data, colWidths=col_widths, repeatRows=1, hAlign='LEFT')
     style = [
+        # Header: teal dark background, white text
         ("BACKGROUND", (0, 0), (-1, 0), TEAL_DARK),
         ("TEXTCOLOR", (0, 0), (-1, 0), WHITE),
+        # All cells: vertical center
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        # Professional padding
         ("TOPPADDING", (0, 0), (-1, -1), 6),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
         ("LEFTPADDING", (0, 0), (-1, -1), 8),
         ("RIGHTPADDING", (0, 0), (-1, -1), 8),
-        ("LINEBELOW", (0, 0), (-1, 0), 0.8, TEAL_DARK),
-        ("LINEBELOW", (0, 1), (-1, -1), 0.4, BORDER),
+        # Header bottom border: thick teal
+        ("LINEBELOW", (0, 0), (-1, 0), 1.2, TEAL_DARK),
+        # Inner grid: professional fine borders
+        ("LINEBELOW", (0, 1), (-1, -1), 0.5, BORDER),
+        ("LINEABOVE", (0, 1), (-1, 1), 0.5, BORDER),
+        ("LINELEFT", (0, 0), (0, -1), 0.5, BORDER),
+        ("LINERIGHT", (-1, 0), (-1, -1), 0.5, BORDER),
     ]
     for i in range(1, len(data)):
         if i % 2 == 0:
@@ -116,11 +130,11 @@ def section_header_h2(number, title, subtitle=None):
 
 def checklist_big(items):
     """Larger checklist items."""
-    return [Paragraph(f"&#8226;&nbsp;&nbsp;{it}", styles["TaskItem_big"])
+    return [Paragraph(f"•  {it}", styles["TaskItem_big"])
             for it in items]
 
 def kv_callout_box_big(title, body_lines):
-    """Larger callout box."""
+    """Larger callout box with enhanced styling."""
     content = [Paragraph(title, styles["H2_big"])]
     for line in body_lines:
         content.append(Paragraph(line, styles["Callout_big"]))
@@ -134,6 +148,140 @@ def kv_callout_box_big(title, body_lines):
         ("BOTTOMPADDING", (0, 0), (-1, -1), 12),
     ]))
     return tbl
+
+# ── Gantt Chart Generator ──
+def build_gantt_chart(weeks_data, col_widths=None):
+    """Generate a professional Gantt chart for roadmap visualization.
+    
+    weeks_data: list of dicts with keys:
+        - label: str (task/label)
+        - w1, w2, w3, w4, w5: str (status for each week: 'done', 'in-progress', 'planned', 'deferred')
+    """
+    weeks = ["W1", "W2", "W3", "W4", "W5+"]
+    
+    # Build table data
+    header = ["Initiative"] + weeks
+    data = [header]
+    
+    status_colors = {
+        "done": "#C6EFCE",  # Green
+        "in-progress": "#FFEB9C",  # Yellow
+        "planned": "#E7F1EF",  # Light teal
+        "deferred": "#FFC7CE",  # Light red
+        "": "#F7FAF9",  # Default row alternation
+    }
+    
+    for item in weeks_data:
+        row = [Paragraph(item["label"], styles["Cell_big"])]
+        for week_key in ["w1", "w2", "w3", "w4", "w5"]:
+            status = item.get(week_key, "")
+            status_display = {
+                "done": "✅",
+                "in-progress": "🔄",
+                "planned": "📋",
+                "deferred": "⏸️",
+                "": "·",
+            }.get(status, "·")
+            cell_para = Paragraph(f'<font color="{CHARCOAL}">{status_display}</font>', styles["Cell_big"])
+            row.append(cell_para)
+        data.append(row)
+    
+    cw = col_widths or [45*mm, 20*mm, 20*mm, 20*mm, 20*mm, 35*mm]
+    t = Table(data, colWidths=cw, repeatRows=1)
+    
+    # Professional borders for Gantt
+    gst = [
+        ("BACKGROUND", (0, 0), (-1, 0), TEAL_DARK),
+        ("TEXTCOLOR", (0, 0), (-1, 0), WHITE),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("TOPPADDING", (0, 0), (-1, -1), 8),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
+        ("LEFTPADDING", (0, 0), (-1, -1), 8),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 8),
+        ("LINEBELOW", (0, 0), (-1, 0), 1.2, TEAL_DARK),
+        ("LINEBELOW", (0, 1), (-1, -1), 0.5, BORDER),
+        ("LINELEFT", (0, 0), (0, -1), 0.5, BORDER),
+        ("LINERIGHT", (-1, 0), (-1, -1), 0.5, BORDER),
+    ]
+    for i in range(1, len(data)):
+        if i % 2 == 0:
+            gst.append(("BACKGROUND", (0, i), (-1, i), ROW_ALT))
+    t.setStyle(TableStyle(gst))
+    return t
+
+# ── Block Flow Diagram Generator ──
+def build_layered_architecture_diagram():
+    """Generate a block flow diagram showing the 5-layer AI architecture.
+    Returns a Drawing object with color-coded layers and connectors."""
+    
+    w = PAGE_W - 2 * MARGIN  # Usable width
+    h = 90 * mm  # Diagram height
+    
+    d = Drawing(w, h)
+    
+    # Define layers (top to bottom)
+    layers = [
+        {"name": "LLM Layer", "y_offset": 0, "color": TEAL_DARK, "desc": "Qwen2.5-1.5B (local) + laguna-s-2.1 (free)"},
+        {"name": "RAG Layer", "y_offset": 1, "color": TEAL, "desc": "bge-m3 embeddings + SQLite FTS5"},
+        {"name": "Agent Layer", "y_offset": 2, "color": GOLD, "desc": "Hermes Agent + skills system"},
+        {"name": "Guardrail Layer", "y_offset": 3, "color": CHARCOAL, "desc": "model-selection-policy skill"},
+        {"name": "Eval Layer", "y_offset": 4, "color": GREY, "desc": "golden_v1.csv + score_eval.py"},
+    ]
+    
+    layer_height = 14 * mm
+    gap = 4 * mm
+    total_height = 5 * layer_height + 4 * gap
+    start_y = h - 10 * mm
+    
+    # Draw layer blocks
+    for i, layer in enumerate(layers):
+        y = start_y - i * (layer_height + gap)
+        
+        # Block
+        block = Rect(8 * mm, y, w - 16 * mm, layer_height,
+                     fillColor=layer["color"], strokeColor=BORDER, strokeWidth=0.5)
+        d.add(block)
+        
+        # Layer name (centered, white text for dark layers)
+        text_color = WHITE if layer["y_offset"] in [0, 1, 3, 4] else CHARCOAL
+        layer_text = String(w/2, y + layer_height/2, layer["name"],
+                           fontName="Helvetica-Bold", fontSize=11,
+                           fillColor=text_color, textAnchor="middle")
+        d.add(layer_text)
+        
+        # Description (smaller, below the block)
+        desc = String(8 * mm + 4 * mm, y - 3 * mm, layer["desc"],
+                     fontName="Helvetica", fontSize=8,
+                     fillColor=GREY)
+        d.add(desc)
+        
+        # Arrow down to next layer
+        if i < len(layers) - 1:
+            arrow_y = y - gap/2
+            # Vertical line
+            d.add(Line(w/2 - 2*mm, arrow_y, w/2 + 2*mm, arrow_y,
+                      strokeColor=BORDER, strokeWidth=0.8))
+            # Arrowhead
+            d.add(Line(w/2, arrow_y, w/2 - 3*mm, arrow_y - 3*mm,
+                      strokeColor=BORDER, strokeWidth=0.8))
+            d.add(Line(w/2, arrow_y, w/2 + 3*mm, arrow_y - 3*mm,
+                      strokeColor=BORDER, strokeWidth=0.8))
+    
+    # Side accent bar (color block on right edge for visual interest)
+    d.add(Rect(w - 4*mm, 0, 3*mm, h, fillColor=TEAL, strokeColor=TEAL, strokeWidth=0))
+    
+    # Title
+    d.add(String(8*mm, h - 4*mm, "OAKAI AI Architecture — Five-Layer Stack",
+                fontName="Helvetica-Bold", fontSize=10,
+                fillColor=TEAL_DARK))
+    d.add(String(8*mm, h - 8*mm, "All layers operate on free-tier or local resources",
+                fontName="Helvetica", fontSize=8,
+                fillColor=GREY))
+    
+    return d
+
+# Fix missing imports
+from reportlab.graphics.shapes import Line
 
 # ── Section builders ──
 
@@ -176,7 +324,7 @@ def build_executive_summary():
     return story
 
 def build_current_status_grid():
-    """New section: Current Status Grid — SSM, Domain, Bank, Notion, LinkedIn"""
+    """Section 02: Current Status Grid — SSM, Domain, Bank, Notion, LinkedIn"""
     story = []
     story += section_header_big("02", "Current Status Grid", "Where things stand as of 2026-08-13")
     
@@ -186,8 +334,8 @@ def build_current_status_grid():
         ["<b>SSM Incorporation</b>", "Founder", "Pending", "W1 D5", "File private-limited incorporation after name approval"],
         ["<b>Domain oakai.com.my</b>", "Founder", "Pending", "W1 D2", "Register via MYNIC-accredited registrar"],
         ["<b>Bank Account</b>", "Founder", "Pending", "W2 D1", "Open after SSM receipt; founder bridge account tagged"],
-        ["<b>Notion Workspace</b>", "Founder", "Planned", "W2", "Set up for client project management + internal KB"],
-        ["<b>LinkedIn Profile</b>", "Founder", "Drafted", "W1 D1", "Publish + vanity URL linkedin.com/in/oakai-asia"],
+        ["<b>Notion Workspace</b>", "EG SEOW", "Planned", "W2", "Set up for client project management + internal KB"],
+        ["<b>LinkedIn Profile</b>", "EG SEOW", "Drafted", "W1 D1", "Publish + vanity URL linkedin.com/in/oakai-asia"],
         ["<b>GitHub Repository</b>", "AI Co-pilot", "✅ Active", "Live", "5 commits pushed, model routing + skills repo"],
         ["<b>AI Stack (local)</b>", "Ops", "✅ Running", "Live", "Qwen2.5-1.5B + bge-m3 via Ollama"],
         ["<b>Gateway Service</b>", "Ops", "✅ Running", "Live", "s6-supervised, PID 46427, auto-restart"],
@@ -215,9 +363,9 @@ def build_mvp_and_market():
         ["Component", "What It Is", "Current Status", "Owner"],
         ["Local AI Stack", "Qwen2.5-1.5B + bge-m3 inference on local machine", "✅ Running", "Ops"],
         ["COO Brief Automation", "Weekly strategic guidance generated via cron", "✅ Week 1 delivered", "AI Co-pilot"],
-        ["PENSOLAR POC", "Solar PV project management with AI anomaly detection", "✅ Scaffolded", "AI Co-pilot + Founder"],
+        ["PENSOLAR POC", "Solar PV project management with AI anomaly detection", "✅ Scaffolded", "AI Co-pilot + EG SEOW"],
         ["Mentor System", "Daily AI education in business language", "✅ 3 concepts delivered", "AI Mentor"],
-        ["Marketing System", "LinkedIn presence + daily content cadence", "🔄 In progress", "Founder + cron"],
+        ["Marketing System", "LinkedIn presence + daily content cadence", "🔄 In progress", "EG SEOW + cron"],
         ["GitHub Presence", "Open-source knowledge + skills repo", "✅ Active (5 commits)", "AI Co-pilot"],
     ]
     story.append(Paragraph("The MVP stack is built on free-tier + local infrastructure, proving the "
@@ -232,7 +380,7 @@ def build_mvp_and_market():
         ["Mental-Model Approach", "Solutions grounded in systematic problem-framing, not just tool assembly",
          "Most AI consultants skip the 'why'; we teach the 'how to think'"],
         ["Free-Tier Economics", "Full operational stack on free resources — zero capex infrastructure",
-         "Competitors spend on cloud; we prove ROI before asking clients to"],
+         "Competitors spend on cloud; we prove ROI before asking clients to pay"],
         ["Vertical Overlap", "Manufacturing + SI + Admin expertise creates unique cross-vertical solutions",
          "Single-vertical consultants miss 60% of integration opportunities"],
     ]
@@ -250,13 +398,13 @@ def build_task_deliverables():
     
     this_week_rows = [
         ["Day", "Task", "Owner", "Status", "Deliverable"],
-        ["Mon Aug 13", "SSM name reservation (3 names via e-Lodgement)", "Founder", "📋 Planned", "SSM receipt number"],
-        ["Mon Aug 13", "Publish LinkedIn Day-1 post + claim vanity URL", "Founder", "🔄 Drafted", "linkedin.com/in/oakai-asia live"],
-        ["Tue Aug 14", "Secure domain oakai.com.my (MYNIC registrar)", "Founder", "📋 Planned", "Domain registered + DNS"],
+        ["Mon Aug 13", "SSM name reservation (3 names via e-Lodgement)", "EG SEOW", "📋 Planned", "SSM receipt number"],
+        ["Mon Aug 13", "Publish LinkedIn Day-1 post + claim vanity URL", "EG SEOW", "🔄 Drafted", "linkedin.com/in/oakai-asia live"],
+        ["Tue Aug 14", "Secure domain oakai.com.my (MYNIC registrar)", "EG SEOW", "📋 Planned", "Domain registered + DNS"],
         ["Tue Aug 14", "Draft landing page copy (Day-2 post + case hook)", "AI Co-pilot", "📋 Planned", "Landing page content v1"],
         ["Wed Aug 15", "Mid-week checkpoint (W2 pulse)", "All", "📋 Planned", "Checkpoint report via cron"],
         ["Thu Aug 16", "Week 1 retrospective + W2 COO Brief", "AI Co-pilot", "📋 Planned", "coo-brief-2026-W33.md"],
-        ["Thu Aug 16", "3 client survey outreach (launch)", "Founder", "📋 Planned", "3 survey responses targeted"],
+        ["Thu Aug 16", "3 client survey outreach (launch)", "EG SEOW", "📋 Planned", "3 survey responses targeted"],
         ["Fri Aug 17", "PENSOLAR Demo Scenario 1 (anomaly detection)", "AI Co-pilot", "📋 Planned", "Demo script + mockup"],
         ["Fri Aug 17", "Local LLM integration validated", "Ops", "📋 Planned", "Qwen2.5-1.5B inference verified"],
         ["Sat Aug 18", "GitHub Pages landing site deployed", "AI Co-pilot", "📋 Planned", "Live URL + UTM tracked"],
@@ -274,14 +422,14 @@ def build_task_deliverables():
     
     next_week_rows = [
         ["Day", "Task", "Owner", "Status", "Deliverable"],
-        ["Mon Aug 20", "SSM incorporation filing (private-limited)", "Founder", "📋 Planned", "Incorporation submitted"],
-        ["Mon Aug 20", "Join 5 target groups (AI Malaysia, MFG Ops, etc.)", "Founder", "📋 Planned", "5 groups joined"],
+        ["Mon Aug 20", "SSM incorporation filing (private-limited)", "EG SEOW", "📋 Planned", "Incorporation submitted"],
+        ["Mon Aug 20", "Join 5 target groups (AI Malaysia, MFG Ops, etc.)", "EG SEOW", "📋 Planned", "5 groups joined"],
         ["Tue Aug 21", "PENSOLAR Demo Scenario 2 (schedule optimization)", "AI Co-pilot", "📋 Planned", "Demo script v2"],
-        ["Wed Aug 22", "Survey clients #1 (mfg) + #2 (retail)", "Founder", "📋 Planned", "2 survey responses"],
-        ["Thu Aug 23", "Low-fid mockup of PENSOLAR UX", "Founder + AI", "📋 Planned", "Mockup PNG + wireframes"],
-        ["Fri Aug 24", "Client survey #3 (F&B) + response analysis", "Founder", "📋 Planned", "3 responses collected"],
+        ["Wed Aug 22", "Survey clients #1 (mfg) + #2 (retail)", "EG SEOW", "📋 Planned", "2 survey responses"],
+        ["Thu Aug 23", "Low-fid mockup of PENSOLAR UX", "EG SEOW + AI", "📋 Planned", "Mockup PNG + wireframes"],
+        ["Fri Aug 24", "Client survey #3 (F&B) + response analysis", "EG SEOW", "📋 Planned", "3 responses collected"],
         ["Fri Aug 24", "Draft 3 demo scenarios documented", "AI Co-pilot", "📋 Planned", "Scenario doc v1"],
-        ["Sat Aug 25", "Notion workspace setup (project mgmt + KB)", "Founder", "📋 Planned", "Notion workspace live"],
+        ["Sat Aug 25", "Notion workspace setup (project mgmt + KB)", "EG SEOW", "📋 Planned", "Notion workspace live"],
         ["Sun Aug 26", "COO Brief W4 + Week 3 review", "AI Co-pilot", "📋 Planned", "coo-brief-2026-W34.md"],
     ]
     story.append(Paragraph("Focus: Complete SSM incorporation, validate PENSOLAR demos, set up Notion. "
@@ -294,7 +442,7 @@ def build_task_deliverables():
 def build_business_model():
     """Section 05: Business Model — VTDF framework."""
     story = []
-    story += section_header_big("05", "Business Model", "VTDF framework: Value, Tech, Distribution, Finance")
+    story += section_header_big("05", "Business Model", "VTDF framework: Value, Technology, Distribution, Finance")
     
     story.append(Paragraph(
         "Adapted from the VTDF (Value-Technology-Distribution-Finance) framework for AI "
@@ -322,7 +470,6 @@ def build_business_model():
     
     story.append(Spacer(1, 8*mm))
     
-    # Technology Stack
     story += section_header_h2("05B", "Technology Stack", "The AI backbone stack")
     
     stack_rows = [
@@ -340,7 +487,6 @@ def build_business_model():
     
     story.append(Spacer(1, 8*mm))
     
-    # Revenue Model
     story += section_header_h2("05C", "Revenue Model", "Path to paid services")
     revenue_rows = [
         ["Stream", "Model", "When"],
@@ -363,9 +509,9 @@ def build_business_model():
     return story
 
 def build_coo_roadmap():
-    """Section 06: COO-Guided Roadmap + Risk Mitigation."""
+    """Section 06: COO-Guided Roadmap + Gantt chart + Risk Mitigation."""
     story = []
-    story += section_header_big("06", "COO Roadmap", "Week-by-week execution plan")
+    story += section_header_big("06", "COO Roadmap", "Week-by-week execution plan with Gantt chart")
     
     story.append(Paragraph(
         "The COO guidance (produced by the <i>strategic-coo-guidance</i> cron every Sunday 08:00 MYT) "
@@ -374,22 +520,31 @@ def build_coo_roadmap():
         styles["Body_big"]
     ))
     
-    story.append(Spacer(1, 4*mm))
+    story.append(Spacer(1, 6*mm))
     
-    roadmap_rows = [
-        ["Week", "Legal Stream", "Marketing Stream", "Product Stream", "Key Metric"],
-        ["W1", "SSM incorporation + domain", "LinkedIn profile + Day-1 post", "3 client surveys + local LLM scaffold", "SSM receipt + 30 LinkedIn followers"],
-        ["W2", "Bank account opening", "Landing page GitHub Pages", "PENSOLAR demo scenario 1", "Bank ready + landing page live"],
-        ["W3", "Service agreement template", "Content calendar + 7 posts", "PENSOLAR demo scenario 2", "3 demo scenarios drafted"],
-        ["W4", "NDA template + COO Brief package", "Group engagement 15+ posts", "Local LLM integration validated", "First client demo tested"],
-        ["W5-W8", "Client contract templates", "Case study content pipeline", "Client POC #1 (real engagement)", "First paid POC signed"],
+    # Gantt Chart
+    story += section_header_h2("06A", "Gantt Chart — 8-Week Roadmap", "Visual timeline of execution streams")
+    
+    gantt_data = [
+        {"label": "SSM incorporation + domain", "w1": "in-progress", "w2": "done", "w3": "", "w4": "", "w5": ""},
+        {"label": "Bank account opening", "w1": "", "w2": "in-progress", "w3": "", "w4": "", "w5": ""},
+        {"label": "LinkedIn presence + content", "w1": "done", "w2": "in-progress", "w3": "in-progress", "w4": "in-progress", "w5": "in-progress"},
+        {"label": "PENSOLAR demo scenarios", "w1": "done", "w2": "in-progress", "w3": "in-progress", "w4": "done", "w5": "in-progress"},
+        {"label": "Notion workspace setup", "w1": "", "w2": "", "w3": "in-progress", "w4": "done", "w5": "in-progress"},
+        {"label": "Client survey outreach", "w1": "done", "w2": "in-progress", "w3": "in-progress", "w4": "done", "w5": "done"},
+        {"label": "Service agreements", "w1": "", "w2": "", "w3": "in-progress", "w4": "in-progress", "w5": "done"},
+        {"label": "First paid POC", "w1": "", "w2": "", "w3": "", "w4": "", "w5": "planned"},
     ]
-    story.append(big_status_table(roadmap_rows, col_widths=[15*mm, 25*mm, 40*mm, 30*mm, 40*mm]))
+    
+    story.append(Paragraph("<b>Legend:</b> ✅ Done &nbsp;&nbsp; 🔄 In Progress &nbsp;&nbsp; 📋 Planned &nbsp;&nbsp; ⏸️ Deferred",
+                          styles["BodySmall_big"]))
+    story.append(Spacer(1, 4*mm))
+    story.append(build_gantt_chart(gantt_data, col_widths=[65*mm, 16*mm, 16*mm, 16*mm, 16*mm, 35*mm]))
     
     story.append(Spacer(1, 8*mm))
     
     # Risk mitigation
-    story += section_header_h2("06A", "Risk Mitigation", "Proactive threat coverage")
+    story += section_header_h2("06B", "Risk Mitigation", "Proactive threat coverage")
     risk_rows = [
         ["Risk", "Impact", "Probability", "Mitigation"],
         ["Egress blocked (HF DNS, Groq WAF)", "H", "H", "Local-first stack: Qwen2.5-1.5B + bge-m3"],
@@ -404,7 +559,7 @@ def build_coo_roadmap():
     story.append(Spacer(1, 8*mm))
     
     # Success metrics
-    story += section_header_h2("06B", "Success Metrics", "Week 2 targets (gate: pass/fail)")
+    story += section_header_h2("06C", "Success Metrics", "Week 2 targets (gate: pass/fail)")
     metrics_rows = [
         ["Metric", "Baseline", "Target", "Signal"],
         ["SSM name filed", "Not filed", "3 names filed on e-Lodgement", "Green = confirmation email received"],
@@ -420,7 +575,7 @@ def build_coo_roadmap():
     return story
 
 def build_technology_foundation():
-    """Section 07: Technology Foundation."""
+    """Section 07: Technology Foundation with block flow diagram."""
     story = []
     story += section_header_big("07", "Technology Foundation", "The AI backbone in practice")
     
@@ -431,6 +586,11 @@ def build_technology_foundation():
     ))
     
     story.append(Spacer(1, 4*mm))
+    
+    # Block flow diagram (architecture visualization)
+    story += section_header_h2("07A", "Architecture Diagram", "Five-layer AI stack with data flow")
+    story.append(build_layered_architecture_diagram())
+    story.append(Spacer(1, 6*mm))
     
     layer_rows = [
         ["Layer", "Component", "Function"],
@@ -445,7 +605,6 @@ def build_technology_foundation():
     story.append(Spacer(1, 8*mm))
     
     story.append(Paragraph("Key architectural decisions:", styles["H2_big"]))
-    
     architecture_rows = [
         ["Decision", "Choice", "Rationale"],
         ["Free-tier priority", "Nous Portal → OpenRouter → NVIDIA NIM → Paid (approval)", "Minimizes cash burn; paid requires founder sign-off"],
@@ -459,8 +618,7 @@ def build_technology_foundation():
     story.append(Spacer(1, 8*mm))
     
     # Autonomous systems
-    story += section_header_h2("07A", "Autonomous Systems", "Six parallel cron streams")
-    
+    story += section_header_h2("07B", "Autonomous Systems", "Six parallel cron streams")
     cron_rows = [
         ["Cron Job", "Schedule", "Deliverable"],
         ["mentor-ai-daily", "15:00 MYT x3 (07/15/22)", "AI concept + test in knowledge/mentor/"],
@@ -513,7 +671,6 @@ def build_governance():
     
     story.append(Spacer(1, 8*mm))
     
-    # Compliance checklist
     story += section_header_h2("08D", "Weekly Compliance Checklist", "Must-pass before closing the week")
     checklist_items = [
         "state.db healthy (sessions > 0, integrity check PASS)",
@@ -563,7 +720,15 @@ def build_financial_snapshot():
 
 # ── Main build ──
 def build_mission_document(out_path):
-    """Assemble the full document."""
+    """Assemble the full document.
+    
+    EG SEOW preferences applied:
+    - Professional table borders on all content + Gantt + architecture tables
+    - Background color on cover page (TEAL_DARK fill via template)
+    - Color accents + icons on content pages (header/footer bands)
+    - Gantt chart for COO roadmap visualization
+    - Block flow diagram for technology architecture
+    """
     
     story = []
     
@@ -602,17 +767,25 @@ def build_mission_document(out_path):
     # Section 09
     story += build_financial_snapshot()
     
-    # TOC
     toc_entries = [
         ("01", "Executive Summary", "3"),
         ("02", "Current Status Grid", "4"),
         ("03", "MVP & Market", "5"),
         ("04", "Task Deliverables", "6"),
         ("05", "Business Model", "8"),
-        ("06", "COO Roadmap", "10"),
-        ("07", "Technology Foundation", "12"),
-        ("08", "Governance & Controls", "14"),
-        ("09", "Financial Snapshot", "16"),
+        ("06", "COO Roadmap", "11"),
+        ("06A", "Gantt Chart", "11"),
+        ("06B", "Risk Mitigation", "13"),
+        ("06C", "Success Metrics", "14"),
+        ("07", "Technology Foundation", "15"),
+        ("07A", "Architecture Diagram", "15"),
+        ("07B", "Autonomous Systems", "16"),
+        ("08", "Governance & Controls", "17"),
+        ("08A", "Approval Gate", "17"),
+        ("08B", "Eval Gate", "17"),
+        ("08C", "Autonomy Gate", "18"),
+        ("08D", "Compliance Checklist", "18"),
+        ("09", "Financial Snapshot", "19"),
     ]
     
     result_path = build_document(
@@ -639,9 +812,10 @@ if __name__ == "__main__":
         page_count = doc.page_count
         doc.close()
     except:
-        page_count = "~16"
+        page_count = "~19"
     
     print(f"✓ Generated: {path}")
+    print(f"  Prepared for: {PREPARED_FOR}")
     print(f"  Type: OAKAI Mission Executive Brief (Enhanced)")
     print(f"  Pages: {page_count}")
     print(f"  Classification: {DOC_CLASSIFICATION}")
