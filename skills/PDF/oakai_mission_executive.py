@@ -33,24 +33,31 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 
 # ── Enhanced styles for larger font sizes ──
-styles.add(ParagraphStyle("H1_big", fontName="Helvetica-Bold", fontSize=22,
-    leading=26, textColor=TEAL_DARK, spaceAfter=12))
-styles.add(ParagraphStyle("H2_big", fontName="Helvetica-Bold", fontSize=15,
-    leading=19, textColor=TEAL_DARK, spaceBefore=16, spaceAfter=8))
-styles.add(ParagraphStyle("Body_big", fontName="Helvetica", fontSize=11.2,
-    leading=16.8, textColor=CHARCOAL, alignment=TA_JUSTIFY, spaceAfter=8))
-styles.add(ParagraphStyle("BodySmall_big", fontName="Helvetica", fontSize=9.8,
-    leading=14, textColor=GREY, spaceAfter=6))
-styles.add(ParagraphStyle("CellHead_big", fontName="Helvetica-Bold", fontSize=10,
-    leading=13, textColor=WHITE))
-styles.add(ParagraphStyle("Cell_big", fontName="Helvetica", fontSize=10,
-    leading=14, textColor=CHARCOAL))
-styles.add(ParagraphStyle("Callout_big", fontName="Helvetica", fontSize=10.5,
-    leading=15, textColor=TEAL_DARK, spaceAfter=5))
-styles.add(ParagraphStyle("TaskItem_big", fontName="Helvetica", fontSize=10.5,
-    leading=15, textColor=CHARCOAL, spaceAfter=4, leftIndent=2))
-styles.add(ParagraphStyle("StatusBig", fontName="Helvetica-Bold", fontSize=11,
-    leading=14, alignment=TA_LEFT))
+# Use try/except for idempotency (ReportLab styles are global; .add() raises on duplicate)
+for _name, _style in [
+    ("H1_big", ParagraphStyle("H1_big", fontName="Helvetica-Bold", fontSize=22,
+        leading=26, textColor=TEAL_DARK, spaceAfter=12)),
+    ("H2_big", ParagraphStyle("H2_big", fontName="Helvetica-Bold", fontSize=15,
+        leading=19, textColor=TEAL_DARK, spaceBefore=16, spaceAfter=8)),
+    ("Body_big", ParagraphStyle("Body_big", fontName="Helvetica", fontSize=11.2,
+        leading=16.8, textColor=CHARCOAL, alignment=TA_JUSTIFY, spaceAfter=8)),
+    ("BodySmall_big", ParagraphStyle("BodySmall_big", fontName="Helvetica", fontSize=9.8,
+        leading=14, textColor=GREY, spaceAfter=6)),
+    ("CellHead_big", ParagraphStyle("CellHead_big", fontName="Helvetica-Bold", fontSize=10,
+        leading=13, textColor=WHITE)),
+    ("Cell_big", ParagraphStyle("Cell_big", fontName="Helvetica", fontSize=10,
+        leading=14, textColor=CHARCOAL)),
+    ("Callout_big", ParagraphStyle("Callout_big", fontName="Helvetica", fontSize=10.5,
+        leading=15, textColor=TEAL_DARK, spaceAfter=5)),
+    ("TaskItem_big", ParagraphStyle("TaskItem_big", fontName="Helvetica", fontSize=10.5,
+        leading=15, textColor=CHARCOAL, spaceAfter=4, leftIndent=2)),
+    ("StatusBig", ParagraphStyle("StatusBig", fontName="Helvetica-Bold", fontSize=11,
+        leading=14, alignment=TA_LEFT)),
+]:
+    try:
+        styles.add(_style)
+    except:
+        styles[_name] = _style
 
 # ── Document metadata ──
 DOC_DATE = "2026-08-13"
