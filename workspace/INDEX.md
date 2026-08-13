@@ -9,6 +9,7 @@
 || 2026-08-12 | COO | Week 1 bootstrap: legal + mkt + local-LLM plan | strategy/coo-brief-2026-W32.md |
 | 2026-08-12 | Marketing | Day 1 post + profile setup | marketing/daily-brief-2026-08-12.md |
 | 2026-08-12 | Pensolar | PENSOLAR intel update | by_industry/solar_energy/pensolar/logs/2026-08-11.log |
+| 2026-08-13 | solar ops | PENSOLAR | standby+BESS re-revised (72kWp–1MWp exempt; >1MWp RM12+BESS); C&I RM3–5k/Wp; 412 RPVSPs; CAS/TNB 2–4wk | gaps: CP throughput, CAS reject rate, MY inverter RM, green-fin, rework % |
 
 ## 🔑 Active Streams
 - `mentor-ai-daily` → 3x/day (07:00, 15:00, 22:00 MYT) → knowledge/mentor/
@@ -25,3 +26,4 @@
 - Product: foundation phase (Week 1)
 | 2026-08-12 | Marketing | Day 1 post live + group join strategy | marketing/daily-brief-2026-08-12.md |
 | 2026-08-12 | Mentor | Golden-set scaffold: golden_v1.csv + score_eval.py (stop teaser loop, ship artifact) | mentor/daily_notes/2026-08-12.md |
+| 2026-08-13 | Mentor | Safe rollout: shadow→canary→enforce, gated by eval (POC-build→scaling bridge) | mentor/daily_notes/2026-08-13.md |

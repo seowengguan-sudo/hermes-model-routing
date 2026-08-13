@@ -9,3 +9,4 @@ Format: YYYY-MM-DD | concept | test-posed | mastery-prediction
 2026-08-11 | Precision/Recall & confusion matrix (accuracy lies for rare events) | auto_schedule 2x2: TP/FP/FN/TN + which metric gates safety | predicted: will grasp
 2026-08-11 | Golden set / ground-truth curation (leakage, stratify, freeze+version) | golden_v1 built from live final permit dates scores 100% recall — name the defect, the column fix, and the right block-case count | predicted: high on defect/fix, medium on stratification
 2026-08-12 | Golden-set scaffold DELIVERED (golden_v1.csv + score_eval.py) — stopped teaser loop | run score_eval.py on real tool predictions; report 2x2 + ship-gate number + missed block case | predicted: artifact lands; audit sign-off pending
+2026-08-13 | Safe rollout (shadow→canary→enforce, recall-gated) | permit-lapse FN in canary → first action + which 2×2 number | predicted: grasped (synthesis of R3+R5+R7)

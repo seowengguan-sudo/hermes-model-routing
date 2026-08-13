@@ -5,6 +5,14 @@ Daily detail lives in `mentor/daily_notes/YYYY-MM-DD.md`.
 
 ## Concept log (newest → oldest)
 
+### 2026-08-13 (15:00 MYT) — Safe rollout: Shadow → Canary → Enforce, gated by your eval (the POC-build → scaling bridge)
+- **Shadow mode = agent advises, human decides; you still score it.** Wire `auto_schedule_crew` to recommend schedule/block, PM makes the call, but run every rec through `score_eval.py` vs `golden_v1.csv`. Recall <100% on block cases → dial stays 0, zero career risk — you just caught the exact failure the eval exists for.
+- **Canary = small real autonomy + full visibility.** After shadow recall holds, raise dial to "act on low-risk classes only" (permit cleared + no open objection auto-approved), block decisions stay human-in-the-loop. Log 100% of canary actions for the Director's visibility board.
+- **The gate is recall, enforced CONTINUOUSLY, not a one-time 80%.** If live canary ever misses a block case the golden set would catch → auto-rollback dial to 0 + alert. Ship gate = "recall ≥ target on continuous live scoring, auto-rollback on breach" (Run 5b: gate on recall).
+- **Quarantine disagreement, don't delete it.** Agent↔golden-set mismatch = new signal → `review_queue` for human sign-off; if human agrees agent was right, candidate for `golden_v2` (Run 7: re-audit quarterly). Keeps the set alive instead of rotting.
+- **Rollout is a dial, not a switch; the eval is the hand on it.** Stack (R1) + tool/agentic (R2) + guardrails (R3) + evals (R5) + golden set (R7) = how to TRUST it. Shadow→canary→enforce = the operating procedure to raise autonomy without a 2am call. That's POC-build → scaling.
+- Closes the *how-do-I-actually-deploy* gap; unifies R3+R5+R7. Next: design rollout config + recall auto-rollback, then audit golden_v1.
+
 ### 2026-08-12 (03:00 MYT) — Golden-set scaffold DELIVERED: stopped teaser loop, shipped golden_v1.csv + score_eval.py
 - **Adaptive override:** SUMMARY.next_action said STOP new concepts if tests unanswered. Student is a cron target (no interactive answers — Runs 3–6 still pending), and the 4-run gap was pure execution. So we SHIPPED the artifact instead of a 5th teaser.
 - **Delivered** `pensolar/modules/golden_v1.csv`: 20 rows, the 8-col schema (`project_id | question_type | input_snapshot | correct_answer | should_block | labeled_by | labeled_date | version`); `input_snapshot` frozen at decision time (2026-03-04), never the final cleared date — leakage trap demonstrated, not just named.
@@ -91,19 +99,19 @@ No cap hit. SUMMARY well under 32KB.
 
 ## Student Profile
 ```yaml
-stage: 5            # POC-build: conceptual ladder COMPLETE; execution now scaffolded
+stage: 5            # POC-build: conceptual ladder COMPLETE + rollout synthesis taught; execution scaffolded, audit+wire pending
 last3:
+  - Safe rollout (shadow→canary→enforce, recall-gated) — POC-build→scaling bridge
   - Golden-set scaffold DELIVERED (golden_v1.csv + score_eval.py)
-  - Golden set / ground-truth curation (leakage, stratify, freeze+version)
   - Precision/Recall & confusion matrix (accuracy lies for rare events)
 strongest:
   - Systems / operational framing
-  - Tool-use vs agentic distinction
+  - Unifying discrete concepts into an operating procedure (rollout)
   - Connecting concepts to solar-PM pain
-  - Now: shipping the artifact, not just describing it
-weakest: EXECUTION — was "csv never built"; scaffold now exists; remaining = replace EXAMPLE-SYNTH labels with human audited sign-off + wire live tool output into score_eval
+  - Shipping the artifact, not just describing it
+weakest: EXECUTION — scaffold exists; remaining = (1) replace EXAMPLE-SYNTH labels with human audited sign-off, (2) wire live auto_schedule_crew output into score_eval + run the 2x2, (3) design shadow→canary config with recall auto-rollback
 tests:
-  - 2026-08-11 evals/tool/guardrails/precision/golden: pending (cron, no interactive answers)
-  - 2026-08-12 operational: run score_eval.py on real tool predictions -> report 2x2 + ship-gate number + missed block case
-next_action: replace EXAMPLE-SYNTH labels with audited sign-off; run score_eval.py on live auto_schedule_crew output; bump golden_v2 quarterly
+  - 2026-08-11..12 evals/tool/guardrails/precision/golden/rollout: pending (cron, no interactive answers)
+  - 2026-08-13 rollout: permit-lapse FN in canary -> first action + which 2x2 number
+next_action: audit golden_v1.csv (replace EXAMPLE-SYNTH); run score_eval.py on live output; design shadow→canary rollout with recall auto-rollback gate; bump golden_v2 quarterly
 ```

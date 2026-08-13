@@ -9,7 +9,7 @@ Groq / Cerebras / HF are EXCLUDED (Cloudflare WAF 1010 from user's egress ASN TT
 ## Free tiers
 | Provider | RPM | TPM | Daily reset | Notes |
 |---|---|---|---|---|
-| Nous Portal | 50* (third-party guide on $0 tier; user reports 200 on higher plan) | 500K | MYT 08:00 | Verify actual plan RPM before relying on 200. |
+| Nous Portal | **20 RPM / 500 TPM** ($0 tier; some report 200 RPM on higher paid plan — verify) | Daily reset MYT 8am. `laguna-s:free` and `step-3.7-flash:free` are NOT on Nous free tier. Works through Hermes gateway; direct API 403s on OAuth expiry. |
 | OpenRouter | 20/min, **50/day** | per-model | Daily | 50 req/day is the BINDING agentic constraint; 429 expected mid-task. |
 | NVIDIA NIM | n/a | n/a | **ONE-TIME lifetime** | On exhaustion free tier is permanently gone → escalate to paid, never retry. |
 

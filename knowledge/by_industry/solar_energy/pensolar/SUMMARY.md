@@ -1,10 +1,13 @@
 # PENSOLAR - Compressed Operating-Model Distillation (living)
-Last pull: 2026-08-11 (run 2) | Vertical: Solar PV integration (residential + C&I), Penang / Peninsular MY
+Last pull: 2026-08-13 (run 3) | Vertical: Solar PV integration (residential + C&I), Penang / Peninsular MY
 Scope: workflow, regulatory gates, cost structure, pain points. Maintain <=32KB.
 Source base (run 1): SEDA NEM 3.0 [1], Northern Solar [2], Trexon [3], Eigen EPC [4], Ember [5], IEA-PVPS MY2025 [6].
 Source base (run 2): Homi Solar ATAP guide [S1], solaratap.com.my process guide [S2], SEDA ATAP reportal [S3],
 Samaiden SELCO update [S4], myTNB SELCO [S5], NREL O&M model TP-74840 [S6], pv-maps O&M [S7],
 Trexon O&M service [S8], CommercialSolarGuy O&M [S9], SolarPowerEurope GMO [S10], Enerdata PV 2026 [S11].
+Source base (run 3): Sunview SELCO-BESS 2026 [R1], Shu Pin & Assoc standby/BESS legal [R2], buySolar ATAP FAQ [R3],
+Trexon install timeline [R4], Northern Solar commercial setup [R5], SolarDir RPVSP count [R6],
+Northern Solar C&I cost [R7], Trexon C&I cost [R8].
 
 ## 1. Regulatory frame (MY, Peninsular)
 - SEDA = Implementing Agency; Energy Commission (EC) regulates; TNB = grid/distribution licensee.
@@ -48,11 +51,14 @@ P6 O&M/After-sales 20-25yr: field cleaning/inspection/monitoring; admin AMC, SLA
 - Fees stack: CAS RM1k-20k + PE + TNB + licensing + standby charge.
 - **ATAP processing fee RM7.50/kW, non-refundable, payable on submission** (10kW = RM75) [S1].
   Trivial per job but must be a billable line item, not absorbed.
-- **STANDBY CHARGE CORRECTED: SELCO non-domestic >72kWp = RM14/kWp/month** [S4][S5]
-  (run 1 recorded ~RM12/kWp/mo and pegged it at >1MWp — both wrong; threshold is 72kWp,
-  new capacity threshold reported applying above 1MWac separately).
-  Materiality: 100kWp SELCO = RM1,400/mo = RM16.8k/yr recurring against savings — can move
-  payback by 1-2 yr. MUST appear in every SELCO ROI model or PENSOLAR mis-sells the payback.
+- **STANDBY CHARGE + BESS RE-REVISED (2026-08-13, run 3 — corrects run 2):** the run-2 figure
+  RM14/kWp/mo for ALL >72kWp SELCO was WRONG for the 72kWp–1MWp band. Per PETRA (27 Feb 2025)
+  + ST (31 Dec 2025): SELCO 72kWp–1MWp is now EXEMPT from standby charge; ONLY >1MWp pays
+  RM12/kWp/month (cut from RM14) [R1][R2]. BESS mandate threshold RAISED from 72kWp to >1MWac
+  (effective 1 Jan 2026) — so PENSOLAR's typical SELCO C&I 72kWp–1MWac range needs NEITHER BESS
+  NOR standby charge [R1][R2]. Materiality: the run-2 warning (RM1,400/mo on 100kWp) is VOID for
+  the 72kWp–1MWp band; SELCO ROI for that band is BETTER than previously modelled. >1MWp still
+  carries RM12/kWp/mo standby + mandatory BESS. Re-run SELCO ROI with the banded rule.
 - MD (maximum demand) / power-factor surcharge: for supply <132kV, 1.5% of energy+demand+AFA
   charges per 0.01 below 0.85 PF [S5-adj] — solar+BESS pitch lever for C&I.
 - 2025 Q3 tariff hike hits industrial; TOU / AFA (replaces ICPT) changes cash-flow planning [6].
@@ -110,9 +116,47 @@ P6 O&M/After-sales 20-25yr: field cleaning/inspection/monitoring; admin AMC, SLA
 - Segment the schedule: residential 6-8wk SLA vs C&I 3-5mo. Never one blended timeline KPI.
 - Gate every job on CCC/CF verification at P1, not P5 — cheapest place to kill a stall.
 - Protect margin against fee stack & tariff volatility via fixed-price quotes + escalation clauses.
-- Standby charge (RM14/kWp/mo >72kWp SELCO) must be hard-coded into the ROI calculator.
+- Standby charge: EXEMPT for SELCO 72kWp–1MWp; RM12/kWp/mo ONLY for >1MWp (run-3 corrected). BESS mandatory only >1MWac. Hard-code the BANDED rule, not a flat RM14 into the ROI calculator.
 - Build O&M/SLA backbone as recurring revenue: RM40-80/kW/yr C&I, RM500-900/yr residential,
   with an explicit inverter sinking fund. Instrument callback rate from day 1 (no external benchmark exists).
 - Pre-qualify Tier-1 suppliers + dual-source; buy module price cover now, secure CREW/CP capacity for 2027-29.
 - Maintain SEDA-Registered service-provider status — it is a legal prerequisite, i.e. a defensible moat.
 - Track ATAP/SELCO/BESS rule changes; train sales/engineering on new caps & SMP crediting.
+
+## 6. Run-3 fills (2026-08-13)
+### 6a. CAS / TNB approval turnaround (KPI: timeline adherence) — was gap 1
+- End-to-end contract→activation 8–14wk [R4]. Breakdown: SEDA notification up to 2 months
+  (§15.5 GP/ST/No.60/2025), TNB approval 2–3wk, physical install 2–3 days, final TNB
+  inspection + bidirectional meter 1–2wk [R4]. Northern Solar: grid approval 2–4wk [R5].
+- IMPLICATION: for >72kW CAS jobs, CAS is EMBEDDED in the TNB approval band (2–4wk), not a
+  separate longer pole. The long pole is SEDA's own notification (up to 8wk). Realistic C&I
+  baseline = SEDA-notify 8wk + TNB 3wk + install/meter 3wk ≈ 14wk. Track SEDA-notify as its
+  own external-wait clock, distinct from crew KPI.
+- Residual: CAS rejection/derate rate by band still unpublished (see §7 gap 2).
+
+### 6b. CP / RPVSP supply (KPI: procurement lead time + install cost/kW) — was gap 2
+- SEDA-registered PV Service Providers (RPVSP): ~412 as of 2026 [R6], vs an older SEDA figure
+  of 110. Market is WELL-POPULATED; the run-2 thesis that 'labour is the 2027–29 bottleneck' is
+  OVERSTATED at the installer level.
+- IMPLICATION: binding constraint is NOT installer headcount but (a) certified-Competent-Person
+  sign-off throughput and (b) TNB/SEDA processing speed. Expect ample installer competition to
+  keep crew rates in check; the real capacity play is pre-booking CP sign-off for peak 2027–29.
+
+### 6c. C&I installed cost per kW (KPI: install cost/kW) — was gap 4
+- C&I rooftop capex ≈ RM3,000–5,000/kWp (RM3–5/Wp): Northern Solar 50kWp–1MWp averages
+  RM4,000–5,000/kWp [R7]; Trexon 50kWp from RM150k (=RM3,000/kWp), 100kWp RM300k, up to RM1.6M [R8].
+- Residential anchor ~RM3,000–3,500/kWp [2][3] — C&I per-kWp is similar/slightly higher.
+- Run-1 envelope RM100k–500k ≈ 33–125kWp at RM3–4k/Wp — internally consistent.
+- Residual: clean module/inverter/racking/labour/fees SPLIT still unpublished (see §7 gap 6).
+
+### 6d. Standby charge + BESS (KPI: install cost/kW) — was gap 3, RESOLVED
+- Net 2026 rule: SELCO 72kWp–1MWp EXEMPT standby + no BESS; >1MWp RM12/kWp/mo + mandatory BESS
+  >1MWac. See corrected §3 block. Re-run SELCO ROI with the BANDED rule, not the run-2 flat RM14.
+
+## 7. Open gaps (feed next run, priority order)
+1. Certified Competent Person (CP) individual count + sign-off queue wait (Peninsular MY) — the
+   real 2027–29 constraint is CP throughput, not installer count (412 RPVSPs). KPI: timeline + cost/kW.
+2. CAS rejection / derate rate by capacity band (72kW–1MW) — drives redesign loops. KPI: timeline.
+3. MY-market inverter replacement RM quote (string vs central) + AMC sinking-fund sizing. KPI: callback cost.
+4. Green-financing / GTFS-successor terms for C&I under ATAP (tenor, rate). KPI: cost/kW + closure.
+5. Rework cost % of contract when design errors surface at commissioning. KPI: cost/kW + quality.

@@ -4,7 +4,7 @@
 |---|---|---|
 | OpenRouter | **50 requests/day**, 20 req/min | The 50/day is the BINDING constraint for agentic multi-call work; one task with sub-calls can exhaust it in minutes. Daily reset. |
 | NVIDIA NIM | one lifetime credit pool | Effectively a fixed pool; once gone, position-3 fails permanently — router must skip to paid, not retry. |
-| Nous Portal | ~50 RPM / 500K TPM ($0 tier) | Some sources cite 200 RPM — verify the user's actual plan. Daily reset MYT 8am. |
+| Nous Portal | **20 RPM / 500 TPM** ($0 tier; some report 200 RPM on higher paid plan — verify) | Daily reset MYT 8am. `laguna-s:free` and `step-3.7-flash:free` are NOT on Nous free tier (only `laguna-m.1:free` is). Works through Hermes gateway; direct API 403s on OAuth expiry. |
 | Gemini (paid) | credit-gated | Only `gemini-2.5-flash` reachable; 1.5/2.0/2.5-pro are 404 at the OpenAI-compat URL. Needs user approval before use. |
 | DeepSeek (paid) | credit-gated (~$0.09/M for v4-flash) | `deepseek-v4-flash` / `deepseek-v4-pro` OK; needs user approval. |
 

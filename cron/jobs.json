@@ -22,15 +22,15 @@
       "schedule_display": "0 7,11,15,19 * * *",
       "repeat": {
         "times": null,
-        "completed": 7
+        "completed": 8
       },
       "enabled": true,
       "state": "scheduled",
       "paused_at": null,
       "paused_reason": null,
       "created_at": "2026-08-11T05:19:40.369279+00:00",
-      "next_run_at": "2026-08-12T07:00:00+00:00",
-      "last_run_at": "2026-08-12T02:55:35.488307+00:00",
+      "next_run_at": "2026-08-13T07:00:00+00:00",
+      "last_run_at": "2026-08-13T03:59:09.195491+00:00",
       "last_status": "ok",
       "last_error": null,
       "last_delivery_error": null,
@@ -62,15 +62,15 @@
       "schedule_display": "0 7 * * *",
       "repeat": {
         "times": null,
-        "completed": 5
+        "completed": 6
       },
       "enabled": true,
       "state": "scheduled",
       "paused_at": null,
       "paused_reason": null,
       "created_at": "2026-08-11T05:19:52.543806+00:00",
-      "next_run_at": "2026-08-12T07:00:00+00:00",
-      "last_run_at": "2026-08-11T09:12:25.109028+00:00",
+      "next_run_at": "2026-08-13T07:00:00+00:00",
+      "last_run_at": "2026-08-13T04:00:16.396961+00:00",
       "last_status": "ok",
       "last_error": null,
       "last_delivery_error": null,
@@ -91,7 +91,7 @@
       "provider_snapshot": "nous",
       "model_snapshot": "poolside/laguna-s-2.1:free",
       "base_url": null,
-      "script": "bash /opt/data/workspace/cleanup-policy.conf",
+      "script": "cleanup-policy.sh",
       "no_agent": false,
       "context_from": null,
       "schedule": {
@@ -102,22 +102,23 @@
       "schedule_display": "0 2 * * *",
       "repeat": {
         "times": null,
-        "completed": 0
+        "completed": 1
       },
       "enabled": true,
       "state": "scheduled",
       "paused_at": null,
       "paused_reason": null,
       "created_at": "2026-08-11T11:40:32.082852+00:00",
-      "next_run_at": "2026-08-12T02:00:00+00:00",
-      "last_run_at": null,
-      "last_status": null,
+      "next_run_at": "2026-08-14T02:00:00+00:00",
+      "last_run_at": "2026-08-13T04:02:42.735295+00:00",
+      "last_status": "ok",
       "last_error": null,
       "last_delivery_error": null,
       "deliver": "local",
       "origin": null,
       "enabled_toolsets": null,
-      "workdir": null
+      "workdir": null,
+      "fire_claim": null
     },
     {
       "id": "75e36f8dd14d",
@@ -181,15 +182,15 @@
       "schedule_display": "0 6 * * 1-6",
       "repeat": {
         "times": null,
-        "completed": 1
+        "completed": 2
       },
       "enabled": true,
       "state": "scheduled",
       "paused_at": null,
       "paused_reason": null,
       "created_at": "2026-08-11T13:56:17.455177+00:00",
-      "next_run_at": "2026-08-12T06:00:00+00:00",
-      "last_run_at": "2026-08-11T14:03:36.220324+00:00",
+      "next_run_at": "2026-08-13T06:00:00+00:00",
+      "last_run_at": "2026-08-13T03:57:32.932043+00:00",
       "last_status": "ok",
       "last_error": null,
       "last_delivery_error": null,
@@ -221,15 +222,15 @@
       "schedule_display": "0 6 * * *",
       "repeat": {
         "times": 1,
-        "completed": 1
+        "completed": 2
       },
-      "enabled": true,
-      "state": "scheduled",
+      "enabled": false,
+      "state": "completed",
       "paused_at": null,
       "paused_reason": null,
       "created_at": "2026-08-12T03:39:09.033026+00:00",
-      "next_run_at": "2026-08-12T06:00:00+00:00",
-      "last_run_at": "2026-08-12T03:41:35.609077+00:00",
+      "next_run_at": null,
+      "last_run_at": "2026-08-13T03:58:13.631426+00:00",
       "last_status": "ok",
       "last_error": null,
       "last_delivery_error": null,
@@ -240,5 +241,5 @@
       "fire_claim": null
     }
   ],
-  "updated_at": "2026-08-12T03:41:39.960376+00:00"
+  "updated_at": "2026-08-13T04:02:42.737432+00:00"
 }

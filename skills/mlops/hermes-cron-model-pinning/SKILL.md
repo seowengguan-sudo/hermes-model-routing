@@ -32,6 +32,8 @@ Use `hermes cron edit <id> --model … --provider …` from the terminal instead
 If a model 404s ("couldn't find that"), check BOTH provider and exact id spelling.
 
 ## Repair a broken `script` field (phantom "Script Error" every tick)
+
+Two modes — **Mode A**: `script` holds a literal STUB (no real script) → clear to `""`. **Mode B**: `script` holds a full COMMAND but a real script exists → relocate it into `scripts/` (see Mode B below, before Pitfall #3). Misdiagnosing B as A and clearing the field DESTROYS the job's intended work.
 Symptom: every cron tick delivers "## Script Error / The data-collection script failed"
 even though the agent still appears to run. Root cause: the job's `script` field holds a
 literal string (e.g. `echo "…stub…"`) instead of a real script path. The runner resolves it
@@ -51,6 +53,50 @@ Fix — prefer the CLI, fall back to direct edit:
    watchdogs (`learn-pensolar`) can share this exact defect — clear `script` on BOTH.
 3. Verify with `scripts/verify_cron_script_field.py` (replicates the gate, flags any job whose
    `script` is truthy but not a real file under scripts/). Schema detail in `references/cron-jobs-json-schema.md`.
+
+### Mode B — `script` holds a FULL COMMAND but the job has a real script (RELOCATE, don't clear)
+Seen 2026-08-13: `workspace-cleanup-daily` had `script: bash /opt/data/workspace/cleanup-policy.conf`.
+The runner does NOT shell-parse the field — it treats the whole string as a filename and joins a
+relative one under `$HERMES_HOME/scripts/`, so it looks for
+`/opt/data/scripts/bash /opt/data/workspace/cleanup-policy.conf` (a path with an embedded space)
+→ `Script not found`. Fix = make the field a real relative script name resolving to a file inside `scripts/`:
+1. Copy the script INTO `$HERMES_HOME/scripts/` (the containment guard BLOCKS absolute paths
+   outside this dir — Pitfall #12). e.g. `/opt/data/workspace/cleanup-policy.conf` →
+   `/opt/data/scripts/cleanup-policy.sh`.
+2. Give it a `.sh`/`.bash` extension so the runner picks `bash` (NOT `.conf`/extension-less — Pitfall #13).
+   The shebang is ignored; interpreter is extension-only.
+3. Set `script` to the relative basename `cleanup-policy.sh` (NOT the absolute path, NOT the old `bash …` string).
+4. Verify with `scripts/verify_cron_script_field.py` →
+   `[workspace-cleanup-daily] script='cleanup-policy.sh' -> OK (runs before agent)` and
+   `PASS: no broken script fields.` (Known-good template: `scripts/cleanup-daily.sh`;
+   verified session artifact: `/opt/data/scripts/cleanup-policy.sh`.)
+
+### Runner mechanics (scheduler.py::_run_job_script — confirms Modes A & B)
+```
+scripts_dir = HERMES_HOME / 'scripts'
+raw = Path(script_path).expanduser()
+path = raw if raw.is_absolute() else (scripts_dir / raw).resolve()  # relative joins under scripts/
+path.relative_to(scripts_dir_resolved)   # RAISES -> Blocked: ... outside the scripts directory if it escapes
+if not path.exists(): return False, 'Script not found: {path}'
+suffix = path.suffix.lower()
+argv = ['bash', str(path)] if suffix in {'.sh','.bash'} else [python_exe, str(path)]
+```
+So: (a) the field is a PATH, never a shell command; (b) it must resolve INSIDE `scripts/`;
+(c) extension decides bash vs python. `bash /x.conf` and `/abs/x.sh` (outside scripts/) both fail;
+`x.sh` inside `scripts/` works. Reproduce/verify recipe in `references/cron-script-runner-mechanics.md`.
+
+Pitfall #12 — containment guard: scripts MUST live in HERMES_HOME/scripts/
+Absolute `script` paths OUTSIDE `scripts/` are rejected with `Blocked: script path resolves outside
+the scripts directory`. You cannot point `script` at `/opt/data/workspace/x.sh` — copy the file
+into `scripts/` first. (Relative names are always joined under `scripts/`.)
+
+Pitfall #13 — interpreter chosen by extension, shebang ignored
+Only `.sh`/`.bash` run with `bash`. A `cleanup-policy.conf` or extension-less file is executed with
+`python` → syntax/exec error. Rename to `.sh` even when content is bash.
+
+Pitfall #14 — `script` is a path, not a command
+`bash /opt/data/workspace/x.conf` is read as the literal filename `bash /opt/data/workspace/x.conf`
+joined under `scripts/` → not found. Never embed `bash `, args, or flags in the field.
 
 Pitfall #3 — a non-path string in `script`
 Do NOT put an `echo`/note stub in `script`. Only real script files (or empty string) belong
@@ -168,4 +214,4 @@ The `mentor-ai-daily` cron moved from 2x → 3x → **4x/day** (`0 7,15,22 * * *
 5. Check: `cron_runlog.md` shows `[catchup] Done. N jobs backfilled` or `0 missed`
 \n## Related
 `hermes cron edit --help` (all editable fields), `cronjob` tool (list/run/remove),
-`model-selection-policy` (covers model *selection*; this skill covers *pinning* + restart recovery). See `references/startup-enforcement-scripts.md` for script internals.
+`model-selection-policy` (covers model *selection*; this skill covers *pinning* + restart recovery). See `references/startup-enforcement-scripts.md` for script internals. `references/cron-script-runner-mechanics.md` documents the `script` field resolver + containment guard + extension→interpreter rule (covers Mode B / "Script not found" from a full-command `script`).

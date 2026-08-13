@@ -148,6 +148,12 @@ single step is NOT enough if the user explicitly wants zero cron. Always check j
 provenance before treating a cron as pre-existing.
 **As of 2026-08-11 the user chose full factory reset: artifacts deleted AND cron removed.**
 
+**NOTE (2026-08-13):** As of Aug 13, `refresh_models.py` exists on disk at `/opt/data/refresh_models.py`
+(restored from git commit 54c4651). The factory-reset claim above reflects the user's
+intention at that time. To verify current state: `ls /opt/data/refresh_models.py` and
+`grep -n "daily-models-md-refresh" /opt/data/cron/jobs.json`. If both exist, the
+automation is active again — the user may have re-enabled it without explicit notice.
+
 ## USER FRAMING CORRECTION (2026-08-11) — do NOT overstate the automation's value
 The user set per-task auxiliary models in the Hermes UI; those pins ALREADY work
 for healthy/reachable models. The routing layer is **insurance against model

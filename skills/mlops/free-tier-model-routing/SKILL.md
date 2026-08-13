@@ -153,8 +153,9 @@ sequences, follow these rules (learned 2026-08-08):
   design removes. Use a real in-container model (see references/local-model-recommendations.md).
 - **Verified free-tier ceilings (2026-08):** OpenRouter free = 50 req/day, 20 req/min (the 50/day
   is the binding constraint for agentic multi-call work). NVIDIA NIM free = one lifetime credit pool.
-  Nous Portal free = ~50 RPM / 500K TPM ($0 tier; verify the user's actual plan — some report 200 RPM).
-  These feed the `Provider_Budget` sheet that the token-gate loop reads.
+  Nous Portal free = **20 RPM / 500 TPM (rolling per minute)** — NOT 50 RPM, NOT 500K TPM. Some users report
+  200 RPM on higher plans; verify the user's actual plan. These feed the `Provider_Budget` sheet that the
+  token-gate loop reads.
 
 ## Runtime model vs config default
 - Hermes binds the model at session start. A later `config.yaml` edit does not hot-swap an already-running session.

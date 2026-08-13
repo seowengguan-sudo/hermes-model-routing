@@ -37,7 +37,18 @@ User wants DEEP, STEP-BY-STEP, EXAMPLE-RICH explanations: numbered steps, labele
 - Installing an MCP does NOT bill the external service from your model tokens; it adds tool-schema tokens to every context turn (model-side only) + result tokens. Local MCPs (blender/unreal) cost $0 external.
 - Free-tier availability is catalog-gated: `laguna-s` (1.05M ctx) is NOT in the free catalog; only `laguna-m.1:free` is. Verify against `hermes_cli/models.py` before recommending a model as "free."
 
+## Session Loss / State DB Recovery (learned this session)
+If the user reports ALL sessions vanished from the Hermes dashboard:
+1. Check `/opt/data/state.db` — if it has a valid SQLite header but the `sessions` table returns 0 rows, the DB was zeroed (not deleted). Docker daemon NOT running = not the cause.
+2. Check `/opt/data/state.db-wal` — if it exists on disk and has nonzero size, it contains recent writes. If it was consumed/nothing on disk, check git: `git log --oneline --diff-filter=A -- state.db` to find the commit that captured the WAL.
+3. **Recovery technique:** `git show <commit>:state.db-wal > /tmp/recovery-wal` extracts the WAL from git history. Parse B-tree leaf pages manually (SQLite CLI may not be installed — use python3). WAL page1 header gives database page count; frame headers give page numbers.
+4. **Key finding from this recovery:** WAL pages contain session records as SQLite B-tree leaf cells (type 0x0D). Session IDs match pattern `(20YYMMDD_HHMMSS_6hex)` or `cron_<hex>_<date>_<time>`. Model config JSON (`{"model": ..., "provider": ...}`) is stored inline at the start of each session's payload. System prompt (~3,749 chars) is embedded in every session record. Overflow pages (when payload > page_size) must be followed via SQLite overflow page chaining.
+5. **Files to restore from git after state.db loss:** The skills/, knowledge/, workspace/, cron/, docs/ directories are tracked in git commit 54c4651. If they're missing from the working tree (deleted by a botched git checkout), restore with: `git checkout 54c4651 -- skills/ knowledge/ workspace/ cron/ docs/`. The `.gitignore` in commit 450adc2 excluded `state.db*` which is why the DB itself was never tracked — only the WAL was accidentally committed.
+
+See `references/state-db-recovery.md`.
+
 ## References
 - `references/introspection-landmarks.md` — verified paths, key files, the 6 MCP catalog entries, free-tier model list, context lengths.
 - `references/vision-404-vs-dead-model.md` — a 404 on vision does NOT mean the model is dead (provider/endpoint mismatch case).
 - `references/incremental-vs-repetitive-cron.md` — daily learning jobs must be gap-aware & incremental, not repetitive no-ops.
+- `references/state-db-recovery.md` — recovery technique for zeroed `state.db`: extract WAL from git, parse B-tree pages, restore deleted directories from git commit 54c4651.

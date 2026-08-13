@@ -148,3 +148,41 @@ Key lesson: crons can be the founder's "COO + CTO + CMO" stack — but each must
 - marketing-advisor-daily → hy3 (tactical marketing)
 Do NOT let them blur into generic content farms — pin per-stream purpose.
 
+## learn-<project> gap-driven research loop — validated protocol (2026-08-13)
+The `learn-pensolar` cron (and any `learn-<client>` twin) runs a strict ordered loop that keeps the
+KB honest across runs. Encode it for every per-client intel cron:
+1. READ `by_industry/<vertical>/<client>/SUMMARY.md` (known), `_GAPS.md` (unknown),
+   `RUN_LOG.md` (already researched) — in that order. Never re-search RUN_LOG topics.
+2. THINK as the client's director: map each open gap to a KPI (timeline / cost-per-kW / callback
+   rate / procurement lead time). Only KPI-tied gaps get researched.
+3. SEARCH the explicit gaps ONLY (free web_search; exclude already-saturated domains).
+4. EXTRACT top sources, compress to signal, cite inline [S1..Sn] / [R1..Rn].
+5. REWRITE `SUMMARY.md`: keep valid existing content, APPEND only newly confirmed items, list the
+   3–5 NEW gaps that emerged. Enforce a hard byte cap (PENSOLAR uses 32,768); if a rewrite would
+   exceed it, print `SUMMARY_CAP_HIT: <bytes>` and STOP (do not overwrite) — prune oldest
+   non-critical items on the next run instead.
+6. WRITE `_GAPS.md`: replace with the 3–5 new gaps, highest priority first.
+7. APPEND `RUN_LOG.md`: date | topics | sources-N | gaps-added (one line per run).
+8. APPEND one line to the absolute `workspace/INDEX.md` in
+   `<YY-MM-DD> | <stream> | <client> | <gaps resolved>; <new gaps>` format.
+Final delivery: ONE LINE — `<n> sources pulled; <g> gaps resolved/filled; <n2> new gaps logged;
+SUMMARY now <X>KB.`
+
+### Pitfall: stale regulatory / compliance figures (2026-08-13)
+Tariffs, standby charges, BESS mandates, capacity caps and crediting rules change on government
+announcement and go stale fast; a single dated source can be WRONG by the next run. In run 3,
+run 2's "standby charge RM14/kWp/mo for all >72kWp" was contradicted by PETRA (27 Feb 2025) + ST
+(31 Dec 2025) announcements: the 72kWp–1MWp band is EXEMPT and only >1MWp pays RM12/kWp/mo, BESS
+mandatory only >1MWac. Lesson: when a newer authoritative announcement contradicts a prior run's
+figure, CORRECT it INLINE in SUMMARY (date-stamp the correction) and RE-RUN any downstream model
+that consumed the old number (e.g. SELCO ROI). Never silently overwrite — keep both the old claim
+and the correction traceable. Prefer primary sources (SEDA / ST / PETRA / TNB) over vendor blogs.
+
+### Pitfall: workspace INDEX.md carries a UTF-8 BOM (2026-08-13)
+`read_file` on `workspace/INDEX.md` reports it as BINARY and refuses text — it has a UTF-8 BOM.
+Fix: confirm with `terminal` (`head -c 800 ... | cat -v`), then EDIT via `patch` (matches a stable
+table row and PRESERVES the BOM). Do NOT use `write_file` to rewrite it — that drops the BOM and
+corrupts the file. Append index rows by anchoring `old_string` on the last known table row. Expect a
+"modified by sibling subagent" warning on concurrent cron writes; the patch still lands — verify
+afterwards that your row is present.
+
