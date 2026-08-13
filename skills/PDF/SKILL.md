@@ -148,6 +148,41 @@ m = re.search(rb'startxref\s+(\d+)', d); xoff = int(m.group(1))
 # xref offset verification — catches the #1 "won't open" cause
 ```
 
+### EG SEOW Preferences Applied
+
+When generating documents for EG SEOW:
+
+- **Name:** Always use "EG SEOW" as the prepared-for / author name (never "Weng Guan")
+- **Professional borders:** All tables have full border framework (top, bottom, left, right, internal grid)
+- **Cover background:** TEAL_DARK fill color on first page (template-native via `_draw_cover`)
+- **Color accents:** Header/footer bands with gold divider line on every content page
+- **High contrast:** Saturated fills, white bold text on colored boxes, dark stroke outlines
+- **Gantt charts:** `build_gantt_chart()` for roadmap/timeline visualization with status icons (✅/🔄/📋/⏸️)
+- **Block flow diagrams:** `build_layered_architecture_diagram()` for architecture visualization with color-coded layers
+- **Table cell wrapping:** Every cell uses Paragraph (prevent overflow)
+- **Two-pass TOC:** Page numbers corrected after first build
+- **KeepTogether:** Prevents orphaned headers across page breaks
+
+### Enhanced Document Generator
+
+**File:** `oakai_mission_executive.py` — Full executive brief generator with:
+- 9 sections: Executive Summary → Financial Snapshot
+- Current Status Grid (SSM, Domain, Bank, Notion, LinkedIn tracking)
+- Task Deliverables (THIS WEEK + NEXT WEEK with Gantt chart)
+- Business Model (VTDF framework, tech stack, revenue model)
+- COO Roadmap with Gantt + risk mitigation + success metrics
+- Technology Foundation with block flow architecture diagram
+- Governance with compliance checklist
+- Financial snapshot with budget tables
+
+All preferences verified:
+- ✅ Name: EG SEOW (not Weng Guan)
+- ✅ Professional borders on all tables
+- ✅ Cover background color
+- ✅ Color accents on content pages
+- ✅ Gantt chart for roadmap visualization
+- ✅ Block flow diagram for architecture
+
 ---
 
 ## Build Checklist (Tier 1 — OAKAI Engine)
