@@ -212,6 +212,52 @@ The `mentor-ai-daily` cron moved from 2x → 3x → **4x/day** (`0 7,15,22 * * *
 3. Check: `knowledge/mentor/daily_notes/YYYY-MM-DD.md` was rewritten\n
 4. Check: `workspace/INDEX.md` got new append line for this run\n
 5. Check: `cron_runlog.md` shows `[catchup] Done. N jobs backfilled` or `0 missed`
-\n## Related
+\n## Pitfall #15 — Git auto-sync can corrupt state.db (race condition #68474)
+
+### Incident summary (Aug 12, 2026, MYT)
+A git sync was run while Hermes was actively writing to `state.db`. Git committed
+the file mid-Write-Ahead-Log (WAL) checkpoint, resulting in a **0-byte state.db**.
+Symptoms: dashboard showed "Gateway Status: Off", Active Sessions: 0,
+skills/knowledge/workspaces appeared missing (a second sync had removed them from tracking).
+
+### Root cause chain
+1. **state.db was tracked by git** — it was in the repo's index.
+2. **Race condition**: SQLite was performing a WAL checkpoint (merging WAL pages into
+   the main DB file) while `git add` read the file at the instant `state.db` was
+   0 bytes (between unlink and recreate).
+3. **Git committed the 0-byte file** as a valid blob.
+4. **Zeroed-DB guard failed**: Hermes' `is_zeroed_state_db()`
+   only detects `size > 0 with all-NUL bytes`. A 0-byte file passes this check
+   and opens as a valid-but-empty DB.
+5. **Sessions table empty** → dashboard appeared "blank".
+
+### Protection fix (verified)
+1. **Untrack state.db from git**: `git rm --cached state.db state.db-wal state.db-shm`
+2. **Add to .gitignore**:
+   ```
+   state.db, state.db-wal, state.db-shm, state.db-journal
+   ```
+   Also untrack and ignore `cron/executions.db`, `kanban.db`, `projects.db`
+   (all runtime SQLite). Runtime logs and caches should also be gitignored.
+3. **Enhance pre-commit hook** — block any staged `state.db*`/`*.db` files.
+   Pre-commit hooks run BEFORE the commit is written — they can abort a commit
+   before the race happens (the runtime zeroed-DB guard fires too late).
+4. **Create state snapshots** — `hermes backup --quick` saves state.db, config,
+   .env, auth, and cron to `/opt/data/state-snapshots/`.
+
+### Pitfall #15a — The zeroed-DB guard is too narrow
+`is_zeroed_state_db()` checks `size > 0` then verifies all bytes are NUL.
+A **0-byte file** (size=0) returns False — the guard thinks it's fine.
+**Fix needed in Hermes source**: `if size <= 0: return True`.
+The pre-commit hook is the workaround that prevents the race from reaching the DB.
+
+### Pitfall #15b — Git sync deletes tracked content (double-whammy on Aug 12)
+The second git auto-sync committed the **deletion** of all tracked files in
+`knowledge/`, `skills/`, `workspace/`, `cron/`, `memories/`. Directories still
+existed on disk but were removed from git's index. Recovery:
+`git checkout 54c4651 -- knowledge/ skills/ workspace/ cron/ memories/`.
+Always verify `git ls-files | wc -l` matches expected file count before/after sync.
+
+## Related
 `hermes cron edit --help` (all editable fields), `cronjob` tool (list/run/remove),
 `model-selection-policy` (covers model *selection*; this skill covers *pinning* + restart recovery). See `references/startup-enforcement-scripts.md` for script internals. `references/cron-script-runner-mechanics.md` documents the `script` field resolver + containment guard + extension→interpreter rule (covers Mode B / "Script not found" from a full-command `script`).

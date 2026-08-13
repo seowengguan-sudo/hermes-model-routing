@@ -93,4 +93,8 @@ overlap bugs are invisible in text extraction but visible in the image.
   architecture (swap for other projects).
 - `references/reportlab_flowable_pitfalls.md` — the recurring Flowable/diagram bugs
   (`tuple(Color)` TypeError, double `HexColor(Color)`, positional `Flowable.__init__`,
-  `\n` label wrapping, closed-loop arc math) + the non-negotiable render→PNG→vision check.
+  `\\n` label wrapping, closed-loop arc math) + the non-negotiable render→PNG→vision check.
+- `references/oakai-template-engine.md` — for **branded OAKAI reports** (cover page,
+  TOC, footer rules, brand palette), use the custom template engine at
+  `skills/PDF/oakai_pdf_template.py` instead of the generic helpers here. This is a
+  user-owned skill — read it for the API and style rules, but do not edit it.

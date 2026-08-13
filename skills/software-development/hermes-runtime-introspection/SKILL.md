@@ -37,15 +37,40 @@ User wants DEEP, STEP-BY-STEP, EXAMPLE-RICH explanations: numbered steps, labele
 - Installing an MCP does NOT bill the external service from your model tokens; it adds tool-schema tokens to every context turn (model-side only) + result tokens. Local MCPs (blender/unreal) cost $0 external.
 - Free-tier availability is catalog-gated: `laguna-s` (1.05M ctx) is NOT in the free catalog; only `laguna-m.1:free` is. Verify against `hermes_cli/models.py` before recommending a model as "free."
 
-## Session Loss / State DB Recovery (learned this session)
+## Session Loss / State DB Recovery (learned from Aug 12 incident #68474)
 If the user reports ALL sessions vanished from the Hermes dashboard:
-1. Check `/opt/data/state.db` — if it has a valid SQLite header but the `sessions` table returns 0 rows, the DB was zeroed (not deleted). Docker daemon NOT running = not the cause.
-2. Check `/opt/data/state.db-wal` — if it exists on disk and has nonzero size, it contains recent writes. If it was consumed/nothing on disk, check git: `git log --oneline --diff-filter=A -- state.db` to find the commit that captured the WAL.
-3. **Recovery technique:** `git show <commit>:state.db-wal > /tmp/recovery-wal` extracts the WAL from git history. Parse B-tree leaf pages manually (SQLite CLI may not be installed — use python3). WAL page1 header gives database page count; frame headers give page numbers.
-4. **Key finding from this recovery:** WAL pages contain session records as SQLite B-tree leaf cells (type 0x0D). Session IDs match pattern `(20YYMMDD_HHMMSS_6hex)` or `cron_<hex>_<date>_<time>`. Model config JSON (`{"model": ..., "provider": ...}`) is stored inline at the start of each session's payload. System prompt (~3,749 chars) is embedded in every session record. Overflow pages (when payload > page_size) must be followed via SQLite overflow page chaining.
-5. **Files to restore from git after state.db loss:** The skills/, knowledge/, workspace/, cron/, docs/ directories are tracked in git commit 54c4651. If they're missing from the working tree (deleted by a botched git checkout), restore with: `git checkout 54c4651 -- skills/ knowledge/ workspace/ cron/ docs/`. The `.gitignore` in commit 450adc2 excluded `state.db*` which is why the DB itself was never tracked — only the WAL was accidentally committed.
+1. **Check `/opt/data/state.db`** — `ls -la state.db && head -c16 state.db | od -A x -t x1z`.
+   If it's 0 bytes or has all-NUL bytes after the SQLite header, the DB was zeroed.
+   Docker daemon NOT running ≠ cause; Docker is not involved at all (state.db lives
+   on the WSL2 host filesystem, ext4 on `/dev/sdd`).
+2. **Check `state.db-wal`** — if present on disk with nonzero size, it contains recent
+   writes that haven't been checkpointed. Extract session records via Python:
+   ```python
+   import struct
+   # WAL frame header: 24 bytes → [frame_header(24) + page_data(page_size)]
+   # Frame header at offset 0: magic(4) + db_size(4) + page_num(4) + frame_num(4)
+   # + sector_size(2) + page_size(2)
+   # Session records appear as SQLite B-tree leaf cells (type 0x0D) in the payload.
+   ```
+3. **Recovery from git:** `git show <commit>:state.db-wal > /tmp/recovery-wal` extracts
+   the WAL from git history. In the Aug 12 incident, the WAL was committed at
+   commit `c2e637c` (4.9 MB) while the main DB was committed as 0 bytes.
+4. **Key finding:** state.db WAS tracked by git before the Aug 12 fix. The race condition
+   occurred because a git auto-sync committed state.db mid-WAL-checkpoint (0 bytes).
+   The zeroed-DB guard `is_zeroed_state_db()` only catches `size > 0 + all-NUL`; a
+   0-byte file slips through silently.
+5. **Restore deleted directories:** After state.db loss, check if `knowledge/`,
+   `skills/`, `workspace/`, `cron/`, `memories/` directories still exist on disk
+   but were removed from git tracking. Restore from git:
+   `git checkout 54c4651 -- skills/ knowledge/ workspace/ cron/ docs/`.
 
-See `references/state-db-recovery.md`.
+### Prevention (post-Aug 12 fix)
+- **state.db, *.db files, *.log, runtime caches are now in `.gitignore`** (commit fae7ead/fae7ead2).
+- **Pre-commit hook blocks** any staged `state.db*` or `*.db` file — catches the race
+  BEFORE it's committed (the zeroed-DB guard fires too late at open time).
+- **State snapshots:** `hermes backup --quick` saves to `/opt/data/state-snapshots/`.
+- See also `references/state-db-recovery.md` and the `hermes-cron-model-pinning` skill
+  (Pitfall #15 for full incident details).
 
 ## References
 - `references/introspection-landmarks.md` — verified paths, key files, the 6 MCP catalog entries, free-tier model list, context lengths.
