@@ -75,3 +75,37 @@ projects.db-journal
 __pycache__/
 *.pyc
 *.pyo
+
+# ── Large/Vendor directories (never commit) ──
+.venv/
+.venv-docreader/
+home/.cache/
+.cache/
+.cache/
+
+# ── Large binaries ──
+*.zip
+*.tar.gz
+*.so
+*.dll
+*.dylib
+*.bin
+
+# ── Backup files ──
+*.bak
+*.bak-*
+.env*
+
+# ── Runtime & temp ──
+/tmp/
+/tmp/*/
+*.tmp
+
+# ── Screenshots (large, not needed in repo) ──
+workspace/Samples/*.png
+workspace/Samples/*.jpg
+workspace/Samples/*.jpeg
+
+# ── Document reader data (runtime, not source) ──
+data/
+state/
