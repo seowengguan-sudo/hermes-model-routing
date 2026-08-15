@@ -32,6 +32,52 @@ MAPS_DIR = DATA_DIR / "redaction_maps"
 for d in [UPLOAD_DIR, DOCS_DIR, MAPS_DIR]:
     d.mkdir(parents=True, exist_ok=True)
 
+SETTINGS_FILE = DATA_DIR / "redaction_settings.json"
+
+# ─── Default Settings (all categories enabled by default) ─────────────────────
+def get_default_settings():
+    """Generate default settings with all categories enabled."""
+    settings = {"categories": {}, "custom": []}
+    for group_name, categories in SECURITY_POLICY.items():
+        settings["categories"][group_name] = {
+            "enabled": True,
+            "subcategories": {}
+        }
+        for cat_key, cat_info in categories.items():
+            settings["categories"][group_name]["subcategories"][cat_key] = {
+                "enabled": True,
+                "description": cat_info.get("description", cat_key),
+                "critical": cat_info.get("critical", False)
+            }
+    return settings
+
+def load_settings():
+    """Load user settings from file, or return defaults."""
+    if SETTINGS_FILE.exists():
+        try:
+            with open(SETTINGS_FILE, 'r') as f:
+                settings = json.load(f)
+            # Merge with defaults to ensure new categories are included
+            defaults = get_default_settings()
+            for group in defaults["categories"]:
+                if group not in settings["categories"]:
+                    settings["categories"][group] = defaults["categories"][group]
+                else:
+                    for cat_key in defaults["categories"][group]["subcategories"]:
+                        if cat_key not in settings["categories"][group]["subcategories"]:
+                            settings["categories"][group]["subcategories"][cat_key] = defaults["categories"][group]["subcategories"][cat_key]
+            return settings
+        except Exception:
+            return get_default_settings()
+    return get_default_settings()
+
+def save_settings(settings):
+    """Save user settings to file."""
+    SETTINGS_FILE.parent.mkdir(parents=True, exist_ok=True)
+    with open(SETTINGS_FILE, 'w') as f:
+        json.dump(settings, f, indent=2)
+    return True
+
 # ─── Security Policy Definitions ─────────────────────────────────────────────
 SECURITY_POLICY = {
     "PII": {
@@ -140,21 +186,46 @@ SECURITY_POLICY = {
 class EnhancedRedactionEngine:
     """Enterprise-grade data anonymization engine with business-sensitive detection."""
     
-    def __init__(self):
+    def __init__(self, settings=None):
         # Build flat pattern list from policy
         self.categories = OrderedDict()
+        self.settings = settings if settings else get_default_settings()
         self._build_patterns()
     
     def _build_patterns(self):
-        """Build regex patterns from security policy."""
-        for group_name, categories in SECURITY_POLICY.items():
+        """Build regex patterns from security policy, respecting user settings."""
+        for group_name, group_settings in self.settings.get("categories", {}).items():
+            if not group_settings.get("enabled", True):
+                continue
+            categories = SECURITY_POLICY.get(group_name, {})
             for cat_key, cat_info in categories.items():
+                # Check if this category is enabled in settings
+                sub_settings = group_settings.get("subcategories", {}).get(cat_key, {})
+                if not sub_settings.get("enabled", True):
+                    continue
                 patterns = cat_info.get('patterns', [cat_info.get('pattern', '')])
                 for p in patterns:
                     if p:
                         if cat_key not in self.categories:
                             self.categories[cat_key] = []
                         self.categories[cat_key].append((p, cat_info))
+
+        # Add custom categories
+        for custom in self.settings.get("custom", []):
+            cat_key = custom.get("name", "CUSTOM")
+            if not custom.get("enabled", True):
+                continue
+            pattern_str = custom.get("pattern", "")
+            if pattern_str:
+                cat_info = {
+                    "description": custom.get("description", cat_key),
+                    "dummy_prefix": custom.get("dummy_prefix", cat_key),
+                    "critical": custom.get("critical", False),
+                    "category": custom.get("category", "CUSTOM")
+                }
+                if cat_key not in self.categories:
+                    self.categories[cat_key] = []
+                self.categories[cat_key].append((pattern_str, cat_info))
     
     def redact(self, text):
         """Perform redaction with reversible mapping.
@@ -651,13 +722,78 @@ HTML_UI = r"""<!DOCTYPE html>
     .header h1 { font-size: 22px; }
     .upload-section { padding: 20px 16px; }
   }
+  .btn-secondary {
+    background: #f1f5f9;
+    color: var(--primary);
+    border: 1px solid var(--border);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-secondary:hover { background: #e2e8f0; transform: translateY(-1px); }
+  .modal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: none; align-items: flex-start; justify-content: center;
+    z-index: 1000; padding: 20px; overflow-y: auto;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal-content {
+    background: var(--surface); border-radius: var(--border-radius-lg);
+    max-width: 800px; width: 100%; max-height: 90vh; overflow-y: auto;
+    box-shadow: var(--card-shadow);
+  }
+  .modal-header { padding: 24px 32px 16px; border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center; }
+  .modal-header h2 { font-size: 20px; font-weight: 600; color: var(--primary); }
+  .modal-close { font-size: 24px; cursor: pointer; color: var(--text-secondary); }
+  .modal-body { padding: 24px 32px; }
+  .modal-footer { padding: 16px 32px 24px; border-top: 1px solid var(--border);
+    display: flex; justify-content: flex-end; gap: 12px; }
+  .category-group { margin-bottom: 20px; padding: 16px; border: 1px solid var(--border);
+    border-radius: 10px; background: var(--surface-light); }
+  .category-group h3 { font-size: 16px; font-weight: 600; color: var(--primary);
+    margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .cat-toggle { display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 12px; background: white; border: 1px solid var(--border);
+    border-radius: 8px; margin-bottom: 8px; }
+  .cat-toggle input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+  .cat-toggle label { flex: 1; cursor: pointer; font-size: 14px; }
+  .badge-critical { font-size: 11px; padding: 2px 8px; border-radius: 4px;
+    background: #fef3c7; color: #92400e; margin-left: 8px; }
+  .custom-section { border-top: 2px dashed var(--border); padding-top: 20px; margin-top: 20px; }
+  .custom-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .custom-row input, .custom-row select { flex: 1; padding: 8px 12px; border: 1px solid var(--border);
+    border-radius: 6px; font-size: 14px; }
+  .custom-row button { padding: 8px 16px; background: var(--accent); color: white;
+    border: none; border-radius: 6px; font-size: 13px; cursor: pointer; }
+  .custom-row button:hover { opacity: 0.9; }
+  .custom-item { display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 12px; background: white; border-radius: 6px; margin-bottom: 4px;
+    border: 1px solid var(--border); }
+  .custom-item button { background: var(--error); }
+  .success-banner { background: var(--success); color: white; padding: 12px 20px;
+    border-radius: 8px; margin-bottom: 16px; text-align: center; font-weight: 500; }
 </style>
 </head>
 <body>
 <div class="container">
   <div class="header">
-    <h1><span class="oakai">OAKAI</span> Document Reader</h1>
-    <p class="subtitle">Enterprise Data Anonymization &amp; PII Redaction Engine</p>
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+      <div>
+        <h1 style="display: flex; align-items: center; gap: 8px; justify-content: left;">
+          <span class="oakai">OAKAI</span> Document Reader
+        </h1>
+        <p class="subtitle">Enterprise Data Anonymization &amp; PII Redaction Engine</p>
+      </div>
+      <div style="display: flex; gap: 12px;">
+        <button onclick="openSettings()" class="btn-secondary" style="padding: 10px 20px; font-size: 14px;">⚙️ Settings</button>
+        <button onclick="loadDocs()" class="btn-secondary" style="padding: 10px 20px; font-size: 14px;">🔄 Refresh</button>
+      </div>
+    </div>
   </div>
 
   <div class="documents-section">
@@ -920,10 +1056,180 @@ dropZone.addEventListener('drop', e => {
   }
 });
 
+// ─── Settings Functions ──────────────────────────────────────────────────────
+let currentSettings = null;
+
+async function openSettings() {
+  const overlay = document.getElementById('settingsOverlay');
+  const settingsList = document.getElementById('settingsList');
+  const errorDiv = document.getElementById('settingsError');
+  const successDiv = document.getElementById('settingsSuccess');
+  
+  overlay.classList.add('active');
+  settingsList.innerHTML = '<div style="text-align: center; color: var(--text-secondary); padding: 20px;">Loading...</div>';
+  errorDiv.style.display = 'none';
+  successDiv.style.display = 'none';
+  
+  try {
+    const res = await fetch('/settings');
+    const data = await res.json();
+    currentSettings = data.settings;
+    
+    let html = '';
+    for (const [groupName, groupData] of Object.entries(data.settings.categories)) {
+      const groupLabel = groupName === 'PII' ? 'PII / Sensitive' : 'Business Sensitive';
+      html += '<div class="category-group">';
+      html += '<h3>' + groupLabel + '</h3>';
+      for (const [catKey, catData] of Object.entries(groupData.subcategories)) {
+        const checked = catData.enabled ? 'checked' : '';
+        const criticalBadge = catData.critical ? '<span class="badge-critical">CRITICAL</span>' : '';
+        html += '<div class="cat-toggle">';
+        html += '<label for="' + catKey + '">' + catData.description + criticalBadge + '</label>';
+        html += '<input type="checkbox" id="' + catKey + '" onchange="toggleCategory('' + groupName + '', '' + catKey + '', this.checked)" ' + checked + '>';
+        html += '</div>';
+      }
+      html += '</div>';
+    }
+    
+    // Custom categories section
+    if (data.settings.custom && data.settings.custom.length > 0) {
+      html += '<div class="custom-section"><h3 style="font-size:14px;font-weight:600;margin-bottom:12px;color:var(--primary);">Custom Categories</h3>';
+      data.settings.custom.forEach((custom, idx) => {
+        const checked = custom.enabled ? 'checked' : '';
+        html += '<div class="custom-item">';
+        html += '<span>' + custom.name + ' — ' + (custom.description || '') + '</span>';
+        html += '<input type="checkbox" onchange="toggleCustom(' + idx + ', this.checked)" ' + checked + '>';
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+    
+    settingsList.innerHTML = html;
+  } catch(e) {
+    errorDiv.innerHTML = 'Error loading settings: ' + e.message;
+    errorDiv.style.display = 'block';
+    settingsList.innerHTML = '';
+  }
+}
+
+function toggleCategory(group, catKey, enabled) {
+  if (currentSettings && currentSettings.categories[group] && currentSettings.categories[group].subcategories[catKey]) {
+    currentSettings.categories[group].subcategories[catKey].enabled = enabled;
+  }
+}
+
+function toggleCustom(index, enabled) {
+  if (currentSettings && currentSettings.custom && currentSettings.custom[index]) {
+    currentSettings.custom[index].enabled = enabled;
+  }
+}
+
+async function addCustomCategory() {
+  const name = document.getElementById('customName').value.trim();
+  const pattern = document.getElementById('customPattern').value.trim();
+  const desc = document.getElementById('customDesc').value.trim() || name;
+  const prefix = document.getElementById('customPrefix').value;
+  const errorDiv = document.getElementById('settingsError');
+  
+  if (!name || !pattern) {
+    errorDiv.innerHTML = 'Please enter both category name and regex pattern';
+    errorDiv.style.display = 'block';
+    return;
+  }
+  
+  if (!currentSettings.custom) currentSettings.custom = [];
+  
+  currentSettings.custom.push({
+    name: name,
+    pattern: pattern,
+    description: desc,
+    dummy_prefix: prefix,
+    enabled: true
+  });
+  
+  document.getElementById('customName').value = '';
+  document.getElementById('customPattern').value = '';
+  document.getElementById('customDesc').value = '';
+  
+  // Re-open to show updated list
+  openSettings();
+}
+
+async function saveSettings() {
+  try {
+    const res = await fetch('/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(currentSettings)
+    });
+    const data = await res.json();
+    
+    if (res.ok) {
+      document.getElementById('settingsSuccess').style.display = 'block';
+      setTimeout(() => {
+        document.getElementById('settingsSuccess').style.display = 'none';
+        closeSettings();
+      }, 1500);
+    } else {
+      document.getElementById('settingsError').innerHTML = data.error || 'Save failed';
+      document.getElementById('settingsError').style.display = 'block';
+    }
+  } catch(e) {
+    document.getElementById('settingsError').innerHTML = 'Error: ' + e.message;
+    document.getElementById('settingsError').style.display = 'block';
+  }
+}
+
+function closeSettings() {
+  document.getElementById('settingsOverlay').classList.remove('active');
+}
+
 // Initialize
 loadDocs();
 setInterval(loadDocs, 10000); // Auto-refresh every 10 seconds
 </script>
+</body>
+
+<!-- Settings Modal -->
+<div class="modal-overlay" id="settingsOverlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>🔒 Redaction Settings</h2>
+      <span class="modal-close" onclick="closeSettings()">×</span>
+    </div>
+    <div class="modal-body">
+      <p style="color: var(--text-secondary); margin-bottom: 16px; font-size: 14px;">
+        Select which data categories to redact. Changes take effect on next document processing.
+      </p>
+      <div id="settingsError" style="display: none; color: var(--error); background: #fef2f2; padding: 10px; border-radius: 6px; margin-bottom: 12px;"></div>
+      <div id="settingsSuccess" style="display: none;" class="success-banner">✅ Settings saved successfully!</div>
+      <div id="settingsList">
+        <div style="text-align: center; color: var(--text-secondary); padding: 20px;">Loading categories...</div>
+      </div>
+      <div class="custom-section">
+        <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--primary);">Add Custom Category</h3>
+        <div class="custom-row">
+          <input type="text" id="customName" placeholder="Category name (e.g., PATENT_ID)">
+          <input type="text" id="customPattern" placeholder="Regex pattern">
+        </div>
+        <div class="custom-row">
+          <input type="text" id="customDesc" placeholder="Description">
+          <select id="customPrefix">
+            <option value="CUSTOM">CUSTOM</option>
+            <option value="SSN">SSN</option>
+            <option value="ID">ID</option>
+            <option value="REF">REF</option>
+          </select>
+        </div>
+        <button onclick="addCustomCategory()" style="width: 100%; padding: 10px;">➕ Add Custom Category</button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeSettings()">Cancel</button>
+      <button onclick="saveSettings()" style="background: var(--accent); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 500; cursor: pointer;">💾 Save Settings</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>"""
 
@@ -934,7 +1240,8 @@ def main():
         idx = sys.argv.index("--api-server")
         port = int(sys.argv[idx + 1]) if idx + 1 < len(sys.argv) else 8765
 
-    engine = EnhancedRedactionEngine()
+    settings = load_settings()
+    engine = EnhancedRedactionEngine(settings=settings)
 
     def process_file(filepath, original_filename=None):
         """Process a single file - returns safe doc and redaction map."""
@@ -1028,6 +1335,23 @@ def main():
                 self.send_header("Content-Type", "text/html; charset=utf-8")
                 self.end_headers()
                 self.write_html(HTML_UI)
+            elif path == "/settings":
+                # Return current settings
+                current_settings = load_settings()
+                # Also return policy info for new categories
+                self._json(200, {
+                    "settings": current_settings,
+                    "policy": {
+                        group: {
+                            cat_key: {
+                                "description": cat_info.get("description", cat_key),
+                                "dummy_prefix": cat_info.get("dummy_prefix", cat_key)
+                            }
+                            for cat_key, cat_info in categories.items()
+                        }
+                        for group, categories in SECURITY_POLICY.items()
+                    }
+                })
             elif path == "/documents":
                 docs = []
                 if DOCS_DIR.exists():
@@ -1070,7 +1394,33 @@ def main():
             parsed = urlparse(self.path)
             path = parsed.path
 
-            if path == "/upload":
+            if path == "/settings":
+                # Update settings from POST body
+                try:
+                    content_length = int(self.headers.get('Content-Length', 0))
+                    body = self.rfile.read(content_length)
+                    new_settings = json.loads(body)
+                    save_settings(new_settings)
+                    # Rebuild engine with new settings
+                    engine.settings = new_settings
+                    engine._build_patterns()
+                    self._json(200, {"status": "ok", "message": "Settings saved"})
+                except Exception as e:
+                    self._json(500, {"error": str(e)})
+            elif path == "/settings/categories":
+                # Return all available categories from policy for settings UI
+                categories_list = []
+                for group_name, categories in SECURITY_POLICY.items():
+                    for cat_key, cat_info in categories.items():
+                        categories_list.append({
+                            "group": group_name,
+                            "key": cat_key,
+                            "label": cat_info.get("description", cat_key),
+                            "dummy_prefix": cat_info.get("dummy_prefix", cat_key),
+                            "critical": cat_info.get("critical", False)
+                        })
+                self._json(200, {"categories": categories_list})
+            elif path == "/upload":
                 self._handle_upload()
             elif path == "/process":
                 self._handle_process()
