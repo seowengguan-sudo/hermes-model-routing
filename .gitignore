@@ -91,6 +91,9 @@ home/.cache/
 *.dylib
 *.bin
 
+# BUT allow the OAKAI portable ZIP
+!workspace/Samples/doc_reader_windows_portable.zip
+
 # ── Backup files ──
 *.bak
 *.bak-*
