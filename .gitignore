@@ -113,3 +113,10 @@ workspace/Samples/*.jpeg
 # ── Document reader data (runtime, not source) ──
 data/
 state/
+
+# Doc reader project runtime data (not source code)
+projects/doc_reader/data/uploads/
+projects/doc_reader/data/documents_safe/
+projects/doc_reader/data/redaction_maps/*
+!projects/doc_reader/data/redaction_maps/.gitkeep
+projects/doc_reader/data/redaction_settings.json
