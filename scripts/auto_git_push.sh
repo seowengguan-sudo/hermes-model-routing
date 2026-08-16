@@ -17,6 +17,19 @@ git add scripts/auto_git_push.sh scripts/cleanup.sh 2>/dev/null
 git add workspace/Samples/poc_reader_windows_portable.zip 2>/dev/null
 git add workspace/Samples/ARCHITECTURE.md 2>/dev/null
 
+# Also stage new project structure files
+git add projects/doc_reader/doc_reader_onefile.py 2>/dev/null
+git add projects/doc_reader/deploy_doc_reader.sh 2>/dev/null
+git add projects/doc_reader/MIGRATION_PLAN.md 2>/dev/null
+git add projects/doc_reader/data_security_governance_policy.md 2>/dev/null
+git add projects/doc_reader/auto_git_push.sh 2>/dev/null
+git add projects/doc_reader/cleanup.sh 2>/dev/null
+git add projects/doc_reader/gateway_watchdog.sh 2>/dev/null
+git add "projects/doc_reader/workspace/poc_reader_windows_portable.zip" 2>/dev/null
+git add projects/doc_reader/workspace/portable/run.bat 2>/dev/null
+git add projects/doc_reader/workspace/portable/run.sh 2>/dev/null
+git add projects/doc_reader/workspace/portable/start_silent.vbs 2>/dev/null
+
 # Check if there are staged changes
 if git diff --cached --quiet; then
     echo "[ $(date) ] No important changes to commit"

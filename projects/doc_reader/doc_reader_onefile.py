@@ -21,7 +21,10 @@ from collections import OrderedDict
 # ─── Paths ────────────────────────────────────────────────────────────────
 SCRIPT_DIR = Path(__file__).parent.resolve()
 # Use /opt/data for the containerized environment, or script-local data folder
-if SCRIPT_DIR == Path("/opt/data") or "opt/data" in str(SCRIPT_DIR):
+# Self-contained project detection: if running from projects/doc_reader/
+if "projects/doc_reader" in str(SCRIPT_DIR) or (SCRIPT_DIR.name == "doc_reader" and "projects" in str(SCRIPT_DIR.parent)):
+    DATA_DIR = SCRIPT_DIR / "data"     # Project-local portable path
+elif SCRIPT_DIR == Path("/opt/data") or "opt/data" in str(SCRIPT_DIR):
     DATA_DIR = Path("/opt/data/data")  # Container path
 else:
     DATA_DIR = SCRIPT_DIR / "data"     # Local portable path
