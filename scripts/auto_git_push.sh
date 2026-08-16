@@ -15,6 +15,7 @@ git add doc_reader_agent.py doc_reader_agent_runner.py doc_reader_desktop.py 2>/
 git add deploy_doc_reader.sh 2>/dev/null
 git add knowledge/data_security_governance_policy.md 2>/dev/null
 git add scripts/auto_git_push.sh 2>/dev/null
+git add workspace/Samples/poc_reader_windows_portable.zip 2>/dev/null
 
 # Check if there are staged changes
 if git diff --cached --quiet; then
