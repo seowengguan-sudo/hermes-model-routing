@@ -25,13 +25,13 @@ if SCRIPT_DIR == Path("/opt/data") or "opt/data" in str(SCRIPT_DIR):
     DATA_DIR = Path("/opt/data/data")  # Container path
 else:
     DATA_DIR = SCRIPT_DIR / "data"     # Local portable path
-# Dynamically find venv site-packages (no hardcoded /opt/ or /home/ paths)
+# Dynamic venv detection - no hardcoded absolute paths
 _VENV_CANDIDATES = [
-    SCRIPT_DIR.parent / ".venv-docreader" / "lib" / f"python{sys.version_info.major}.{sys.version_info.minor}" / "site-packages",
-    Path("/opt/data/.venv-docreader/lib") / f"python{sys.version_info.major}.{sys.version_info.minor}" / "site-packages",
-    SCRIPT_DIR.parent.parent / ".venv-docreader" / "lib" / f"python{sys.version_info.major}.{sys.version_info.minor}" / "site-packages",
+    SCRIPT_DIR.parent / ".venv-docreader" / "lib" / f"python3.{sys.version_info.minor}" / "site-packages",
+    SCRIPT_DIR / ".venv-docreader" / "lib" / f"python3.{sys.version_info.minor}" / "site-packages",
+    SCRIPT_DIR.parent.parent / ".venv-docreader" / "lib" / f"python3.{sys.version_info.minor}" / "site-packages",
 ]
-VENV_SITE_PACKAGES = str(next((p for p in _VENV_CANDIDATES if p.exists()), Path(""))) 
+VENV_SITE_PACKAGES = str(next((p for p in _VENV_CANDIDATES if p.exists()), ""))
 UPLOAD_DIR = DATA_DIR / "uploads"
 DOCS_DIR = DATA_DIR / "documents_safe"
 MAPS_DIR = DATA_DIR / "redaction_maps"
@@ -1083,7 +1083,7 @@ async function openSettings() {
         const criticalBadge = catData.critical ? '<span class="badge-critical">CRITICAL</span>' : '';
         html += '<div class="cat-toggle">';
         html += '<label for="' + catKey + '">' + catData.description + criticalBadge + '</label>';
-        html += '<input type="checkbox" id="' + catKey + '" onchange="toggleCategory('' + groupName + '', '' + catKey + '', this.checked)" ' + checked + '>';
+        html += '<input type="checkbox" id="' + catKey + '" onchange="toggleCategory(\'' + groupName + '\', \'' + catKey + '\', this.checked)" ' + checked + '>';
         html += '</div>';
       }
       html += '</div>';
