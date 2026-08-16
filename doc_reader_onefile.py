@@ -25,6 +25,13 @@ if SCRIPT_DIR == Path("/opt/data") or "opt/data" in str(SCRIPT_DIR):
     DATA_DIR = Path("/opt/data/data")  # Container path
 else:
     DATA_DIR = SCRIPT_DIR / "data"     # Local portable path
+# Dynamically find venv site-packages (no hardcoded /opt/ or /home/ paths)
+_VENV_CANDIDATES = [
+    SCRIPT_DIR.parent / ".venv-docreader" / "lib" / f"python{sys.version_info.major}.{sys.version_info.minor}" / "site-packages",
+    Path("/opt/data/.venv-docreader/lib") / f"python{sys.version_info.major}.{sys.version_info.minor}" / "site-packages",
+    SCRIPT_DIR.parent.parent / ".venv-docreader" / "lib" / f"python{sys.version_info.major}.{sys.version_info.minor}" / "site-packages",
+]
+VENV_SITE_PACKAGES = str(next((p for p in _VENV_CANDIDATES if p.exists()), Path(""))) 
 UPLOAD_DIR = DATA_DIR / "uploads"
 DOCS_DIR = DATA_DIR / "documents_safe"
 MAPS_DIR = DATA_DIR / "redaction_maps"
@@ -318,7 +325,7 @@ def extract_text(file_path):
         
         if suffix == '.pdf':
             try:
-                sys.path.insert(0, "/opt/data/.venv-docreader/lib/python3.13/site-packages")
+                sys.path.insert(0, VENV_SITE_PACKAGES)
                 from pypdf import PdfReader
                 reader = PdfReader(str(path))
                 return '\n'.join([page.extract_text() or '' for page in reader.pages])
@@ -332,7 +339,7 @@ def extract_text(file_path):
         
         if suffix == '.docx':
             try:
-                sys.path.insert(0, "/opt/data/.venv-docreader/lib/python3.13/site-packages")
+                sys.path.insert(0, VENV_SITE_PACKAGES)
                 from docx import Document
                 doc = Document(str(path))
                 return '\n'.join([p.text for p in doc.paragraphs])
@@ -350,7 +357,7 @@ def extract_text(file_path):
         
         if suffix == '.xlsx':
             try:
-                sys.path.insert(0, "/opt/data/.venv-docreader/lib/python3.13/site-packages")
+                sys.path.insert(0, VENV_SITE_PACKAGES)
                 from openpyxl import load_workbook
                 wb = load_workbook(str(path), data_only=True)
                 rows = []
@@ -363,7 +370,7 @@ def extract_text(file_path):
         
         if suffix == '.pptx':
             try:
-                sys.path.insert(0, "/opt/data/.venv-docreader/lib/python3.13/site-packages")
+                sys.path.insert(0, VENV_SITE_PACKAGES)
                 from pptx import Presentation
                 prs = Presentation(str(path))
                 text_out = []
