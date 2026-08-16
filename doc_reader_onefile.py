@@ -881,6 +881,10 @@ processBtn.addEventListener('click', async () => {
   processBtn.disabled = true;
   processBtn.textContent = 'Processing...';
   resultsSection.style.display = 'none';
+  const mappingBody = document.getElementById('mappingBody');
+  const resultContent = document.getElementById('resultContent');
+  const resultTitle = document.getElementById('resultTitle');
+  const resultStatus = document.getElementById('resultStatus');
 
   const formData = new FormData();
   formData.append('file', selectedFile);
@@ -889,15 +893,9 @@ processBtn.addEventListener('click', async () => {
     const res = await fetch('/upload', {method: 'POST', body: formData});
     const data = await res.json();
     
-    // Re-enable button first
+    // Re-enable button
     processBtn.disabled = false;
     processBtn.textContent = 'Upload & Process';
-
-    const resultTitle = document.getElementById('resultTitle');
-    const resultStatus = document.getElementById('resultStatus');
-    const resultContent = document.getElementById('resultContent');
-    const redactionSummary = document.getElementById('redactionSummary');
-    const mappingBody = document.getElementById('mappingBody');
 
     if (data.error) {
       resultTitle.textContent = 'Processing Error';
@@ -921,7 +919,7 @@ processBtn.addEventListener('click', async () => {
       // Redaction summary badges
       const categoryGroups = {
         'PII': ['SSN', 'EMAIL', 'PHONE', 'CREDIT_CARD', 'BANK_ACCOUNT'],
-        'BUSINESS': ['PRODUCT_NAME', 'COMPANY_NAME'],
+        'BUSINESS': ['PRODUCT_NAME', 'COMPANY_NAME', 'DIRECTOR_NAME', 'QUOTATION_ID'],
         'FINANCIAL': ['COST_VALUE']
       };
       
@@ -934,7 +932,7 @@ processBtn.addEventListener('click', async () => {
         
         badgesHtml += '<span class="redaction-badge ' + badgeClass + '">' + cat + ': ' + count + '</span>';
       }
-      redactionSummary.innerHTML = badgesHtml;
+      document.getElementById('redactionSummary').innerHTML = badgesHtml;
 
       // Fetch safe content and build result
       try {
@@ -948,10 +946,31 @@ processBtn.addEventListener('click', async () => {
         
         resultContent.textContent = safeText;
         
-        // Mapping table will be populated from the /map endpoint
-        
       } catch(e) {
         resultContent.innerHTML = '<div class="error-msg">Could not load safe document content</div>';
+      }
+
+      // Fetch redaction mapping from separate endpoint (inside try block, with data)
+      try {
+        const mapRes = await fetch('/documents/' + data.document_id + '/map');
+        const mapData = await mapRes.json();
+        
+        let mappingHtml = '';
+        const mapping = mapData.full_map || {};
+        for (const [varName, info] of Object.entries(mapping)) {
+          let badgeClass = '';
+          if (['SSN', 'EMAIL', 'PHONE', 'CREDIT_CARD', 'BANK_ACCOUNT'].includes(info.category)) badgeClass = 'sensitive';
+          else if (['PRODUCT_NAME', 'COMPANY_NAME', 'DIRECTOR_NAME'].includes(info.category)) badgeClass = 'business';
+          else if (['QUOTATION_ID'].includes(info.category)) badgeClass = 'sensitive';
+          else if (['COST_VALUE'].includes(info.category)) badgeClass = 'financial';
+          else badgeClass = 'sensitive';
+          
+          const safeValue = info.original.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          mappingHtml += '<tr><td>' + varName + '</td><td style="font-family: monospace;">' + safeValue + '</td>';
+          mappingHtml += '<td><span class="redaction-badge ' + badgeClass + '">' + info.category + '</span><br><small style="color: var(--text-secondary);">' + info.group + '</small></td></tr>';
+        }
+        mappingBody.innerHTML = mappingHtml || '<tr><td colspan="3">No variables mapped</td></tr>';
+      } catch(e2) {
         mappingBody.innerHTML = '<tr><td colspan="3">Mapping unavailable</td></tr>';
       }
       
@@ -966,39 +985,11 @@ processBtn.addEventListener('click', async () => {
   } catch(e) {
     processBtn.disabled = false;
     processBtn.textContent = 'Upload & Process';
-    const resultContent = document.getElementById('resultContent');
-    const resultsSection = document.getElementById('resultsSection');
-    const resultStatus = document.getElementById('resultStatus');
     resultTitle.textContent = 'Error';
     resultStatus.className = 'status-badge status-error';
     resultStatus.textContent = '✗ Failed';
     resultContent.innerHTML = '<div class="error-msg">Error: ' + e.message + '</div>';
     resultsSection.style.display = 'block';
-  }
-      
-  // Fetch redaction mapping from separate endpoint (NOT from safe doc)
-  try {
-    const mapRes = await fetch('/documents/' + data.document_id + '/map');
-    const mapData = await mapRes.json();
-        
-    let mappingHtml = '';
-    const mapping = mapData.full_map || {};
-    for (const [varName, info] of Object.entries(mapping)) {
-      let badgeClass = '';
-      if (['SSN', 'EMAIL', 'PHONE', 'CREDIT_CARD', 'BANK_ACCOUNT'].includes(info.category)) badgeClass = 'sensitive';
-      else if (['PRODUCT_NAME', 'COMPANY_NAME'].includes(info.category)) badgeClass = 'business';
-      else if (['DIRECTOR_NAME'].includes(info.category)) badgeClass = 'business';
-      else if (['QUOTATION_ID'].includes(info.category)) badgeClass = 'sensitive';
-      else if (['COST_VALUE'].includes(info.category)) badgeClass = 'financial';
-      else badgeClass = 'sensitive';
-          
-      const safeValue = info.original.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-      mappingHtml += '<tr><td>' + varName + '</td><td style="font-family: monospace;">' + safeValue + '</td>';
-      mappingHtml += '<td><span class="redaction-badge ' + badgeClass + '">' + info.category + '</span><br><small style="color: var(--text-secondary);">' + info.group + '</small></td></tr>';
-    }
-    mappingBody.innerHTML = mappingHtml || '<tr><td colspan="3">No variables mapped</td></tr>';
-  } catch(e2) {
-    mappingBody.innerHTML = '<tr><td colspan="3">Mapping unavailable</td></tr>';
   }
 });
 
