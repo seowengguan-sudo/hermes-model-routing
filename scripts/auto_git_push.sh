@@ -10,12 +10,12 @@ cd /opt/data
 git add .gitignore
 
 # Stage important project files only
-git add doc_reader_onefile.py doc_reader_tk.py redaction_engine.py safe_format.py 2>/dev/null
-git add doc_reader_agent.py doc_reader_agent_runner.py doc_reader_desktop.py 2>/dev/null
+git add doc_reader_onefile.py 2>/dev/null
 git add deploy_doc_reader.sh 2>/dev/null
 git add knowledge/data_security_governance_policy.md 2>/dev/null
-git add scripts/auto_git_push.sh 2>/dev/null
+git add scripts/auto_git_push.sh scripts/cleanup.sh 2>/dev/null
 git add workspace/Samples/poc_reader_windows_portable.zip 2>/dev/null
+git add workspace/Samples/ARCHITECTURE.md 2>/dev/null
 
 # Check if there are staged changes
 if git diff --cached --quiet; then
