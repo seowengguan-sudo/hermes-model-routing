@@ -69,7 +69,7 @@ echo ""
 
 # ─── 6. Remove old doc_reader files no longer used ──────────────────────────
 echo "Removing old/unused doc_reader files:"
-for old_file in /opt/data/doc_reader_wsl2.py /opt/data/doc_reader_agent_runner.py; do
+for old_file in /opt/data/doc_reader_agent.py /opt/data/doc_reader_desktop.py /opt/data/redaction_engine.py /opt/data/safe_format.py; do
     if [ -f "$old_file" ]; then
         SIZE=$(du -h "$old_file" | cut -f1)
         echo "  Removing: $(basename $old_file) ($SIZE) - superseded by doc_reader_onefile.py"
