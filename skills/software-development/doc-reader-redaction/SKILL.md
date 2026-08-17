@@ -105,7 +105,10 @@ Repair a clobbered file: `save_settings(get_default_settings())`. Symptom that t
 after the user toggles it off. FIX: at the top of `_build_patterns()` set `self.categories = {}`
 before the loop. Verify: disable EMAIL via POST, `/process` a doc containing an email — it must NOT
 appear in `category_counts`. Full reproduction + minimal patch in references/settings_persistence_bugs.md.
-(See also references/regex_ignorecase_pitfall.md for the regex pitfall.)
+(See also references/regex_ignorecase_pitfall.md for the regex pitfall, and
+references/ui_interaction_fixes.md for Settings modal click-area fixes — toggle switch
+only responds to direct clicks, group expand/collapse is chevron-only, and multi-file
+upload support.)
 
 **Hard rule after ANY settings change:** the POST handler must (1) call `engine._build_patterns()`
 so `self.categories` reflects current enabled flags, and (2) update BOTH `engine.settings` AND the

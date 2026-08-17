@@ -113,7 +113,7 @@ def build():
     d=fitz.open(TMP);p=d[0];px=p.get_pixmap(dpi=170);px.save(PNG);d.close()
     doc=BaseDocTemplate(OUT,page_size=portrait(A4),leftMargin=15*mm,
                         rightMargin=15*mm,topMargin=15*mm,bottomMargin=15*mm)
-    cov=PageTemplate(id='cover',frames=[],onPage=cover_page)
+    cov=PageTemplate(id='cover',frames=[Frame(0,0,1,1)],onPage=cover_page)
     bod=PageTemplate(id='body',frames=[Frame(doc.leftMargin,doc.bottomMargin,doc.width,doc.height)])
     doc.addPageTemplates([cov,bod])
     st=[NextPageTemplate('cover'),PageBreak(),NextPageTemplate('body')]
@@ -187,6 +187,10 @@ def build():
     st.append(Spacer(1,4))
     st+=[Paragraph("Data never crosses the boundary in binary form — all tool results are serialized to text before reaching the model.",B)]
 
+    # DEBUG: inspect story
+    for di, ditem in enumerate(st):
+        if isinstance(ditem, list):
+            print(f"  STORY DEBUG [{di}] = LIST containing {[type(x).__name__ for x in ditem]}")
     doc.build(st)
     print(f"✅ PDF: {OUT} ({os.path.getsize(OUT)/(1024*1024):.1f} MB)")
 

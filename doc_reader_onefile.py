@@ -1203,10 +1203,10 @@ HTML_UI = r"""
     padding: 11px 14px; background: #fff; border: 1px solid var(--border); border-radius: 10px;
   }
   .cat-row label { flex: 1; cursor: default; font-size: 14px; display: flex; align-items: center; gap: 8px; pointer-events: none; }
-  .cat-row { cursor: pointer; }
+  .cat-row { cursor: default; }
   .cat-row input[type=checkbox] { width: 19px; height: 19px; accent-color: var(--gc, #0ea5e9); cursor: pointer; }
   .switch { position: relative; width: 42px; height: 24px; }
-  .switch input { display: none; }
+  .switch input { opacity: 0; width: 100%; height: 100%; cursor: pointer; position: relative; z-index: 2; }
   .slider { position: absolute; inset: 0; background: #cbd5e1; border-radius: 999px; transition: .2s; cursor: pointer; }
   .slider::before { content: ""; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px; background: blue; border-radius: 50%; transition: .2s; }
   .switch input:checked + .slider { background: var(--gc, #0ea5e9); }
