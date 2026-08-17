@@ -185,3 +185,39 @@ skill_view(name="architecture-diagram", file_path="templates/template.html")
 ```
 
 The template contains working examples of every component type (frontend, backend, database, cloud, security), arrow styles (standard, dashed, curved), security groups, region boundaries, and the legend — use it as your structural reference when generating diagrams.
+
+## PDF Generation (reportlab)
+
+When a printable PDF deliverable is required (e.g. professional architecture document), use reportlab in a dedicated venv:
+
+```bash
+cd /opt/data
+uv venv hermes-pdf --python python3
+source hermes-pdf/bin/activate
+uv pip install reportlab pymupdf
+```
+
+### Architecture
+
+1. **Master diagram first** (A3 landscape, `canvas.Canvas`): draw the holistic SVG diagram directly on canvas with `roundRect` boxes, `line` arrows, and `drawCentredString` labels — all in PDF-native coordinates (no SVG→PDF conversion needed).
+2. **Convert to PNG** via pymupdf (`fitz`): `page.get_pixmap(dpi=170).save(PNG)`.
+3. **Cover page** (A3 landscape): `PageTemplate(id='cover', onPage=cover_page)` draws the PNG as full-page background.
+4. **Body pages** (A4 portrait): `PageTemplate(id='body', onPage=body_page)` with a `Frame` for text content (paragraphs + tables).
+
+### ⚠️ Critical Pitfall: `st += [ht(...)]` in Python 3.12+
+
+Python 3.12+ bytecode optimization changes how `story_list += [flowable]` compiles. The compiler emits `BUILD_LIST 1` followed by `BUILD_TUPLE 1`, wrapping the single flowable in a tuple-of-list: `([flowable],)`. When `list.__iadd__` receives `([flowable],)`, it iterates and appends the inner `[flowable]` list as-is — the flowable ends up **nested inside a list in the story**, causing `AttributeError: 'list' object has no attribute 'getKeepWithNext'`.
+
+**Fix:** Use `st.append(ht(...))` instead of `st += [ht(...)]`. The `append` method directly adds the flowable object without any `+=`/`__iadd__` wrapping.
+
+This affects ALL `st += [Flowable()]` patterns — not just tables. Use `st.append(...)` everywhere.
+
+### Page-size switching
+
+`BaseDocTemplate` sets one page size for all pages. To have an A3 cover + A4 body:
+- `cover_page(cv, doc)` calls `cv.setPageSize(landscape(A3))` in `onPage`
+- `body_page(cv, doc)` calls `cv.setPageSize(portrait(A4))` in `onPage`
+- Story sequence: `[NextPageTemplate('cover'), NextPageTemplate('body'), PageBreak(), Paragraph(...), ...]`
+  - Two `NextPageTemplate` calls: first activates cover template, second pre-activates body template
+  - `PageBreak()` triggers cover page rendering (A3 via onPage)
+  - Subsequent flowables use body template (A4 via onPage)

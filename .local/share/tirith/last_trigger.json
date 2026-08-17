@@ -1,28 +1,22 @@
 {
   "rule_ids": [
-    "curl_pipe_shell"
+    "mass_file_deletion"
   ],
-  "severity": "HIGH",
-  "command_redacted": "# Check the drop zone click handler and file input\ncurl -s http://localhost:8765...",
+  "severity": "CRITICAL",
+  "command_redacted": "cd /opt/data && rm -f test_parse.py test_parse2.py debug_braces.py debug_story.p...",
   "findings": [
     {
-      "rule_id": "curl_pipe_shell",
-      "severity": "HIGH",
-      "title": "Pipe to interpreter: curl | python3",
-      "description": "Command pipes output from 'curl' directly to interpreter 'python3'. Downloaded content will be executed without inspection.\n  Safer: tirith run http://localhost:8765/  — or: vet http://localhost:8765/  (https://getvet.sh)",
+      "rule_id": "mass_file_deletion",
+      "severity": "CRITICAL",
+      "title": "Mass file deletion in a short window",
+      "description": "6 non-build files were deleted within 20s. A burst of deletions can be destructive (ransomware-like or an accidental recursive wipe).",
       "evidence": [
         {
-          "type": "command_pattern",
-          "pattern": "pipe to interpreter",
-          "matched": "curl -s http://localhost:8765/ | python3 -c \"\nimport sys, re\ncontent = sys.stdin.read()\n\n# Find the drop zone section\nidx = content.find('dropZone')\nprint('=== Drop zone handler ===')\nprint(content[idx-100:idx+300])\n\nprint()\nprint('=== File input element ===')\nidx = content.find('fileInput')\nprint(content[idx-100:idx+300])\n\nprint()\nprint('=== Upload Area HTML ===')\nidx = content.find('upload-area')\nprint(content[idx:idx+500])\n\""
-        },
-        {
-          "type": "url",
-          "raw": "http://localhost:8765/"
+          "type": "text",
+          "detail": "6 non-build files were deleted within 20s. A burst of deletions can be destructive (ransomware-like or an accidental recursive wipe)."
         }
-      ],
-      "mitre_id": "T1059.004"
+      ]
     }
   ],
-  "timestamp": "2026-08-17T01:39:04.659892578+00:00"
+  "timestamp": "2026-08-17T01:54:23.425654330+00:00"
 }

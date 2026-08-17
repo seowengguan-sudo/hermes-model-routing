@@ -71,8 +71,9 @@ elif path == "/restart":
 ### File input not responding
 Check browser console for JS errors. Usually caused by a scoping bug breaking the entire event loop. File input `accept` attribute must be set: `accept=".pdf,.docx,.xlsx,.pptx,.txt,.csv,.html,.htm,.md,.json"`.
 
+ALSO check CSS: a `display: none` on form inputs (e.g. `.switch input { display: none }`) makes them non-interactive while invisible. Use `opacity: 0` with `z-index` instead to keep them clickable. This was the **silent root cause** of the "all buttons stopped working" regression on Windows portable in 2026-08-17 — fixing the toggle click area (removing label `for` attr) left checkboxes unreachable when `display: none` was used. See references/ui_interaction_fixes.md.
+
 ### "Updated but the screen looks the same" — verify the deploy, not just the edit (session 2026-08-16)
-A UI change that parses fine but shows no visual difference almost always means one of:
 1. **Cosmetic-only change.** Swapping a few hex values in `:root` while leaving the layout/HTML structure identical produces a near-identical screen. If the ask is "professional + colorful + more usable", rebuild the layout (header/cards/groups/legend), not just the palette.
 2. **Wrong deploy location.** The live server is NOT the file you edited. WSL2/container projects run from a *different* dir than where you dropped your work (e.g. live = `/opt/data/projects/doc_reader/`, your edit landed in `Samples/enhanced_X/`). Confirm the running process: `ps aux | grep -i <script>.py`. Copy the finished file into the **live** dir (preserve its `data/` folder + settings file). Never assume the edit sandbox == runtime dir.
 3. **Stale process / browser cache.** A long-running server holds old code in memory; ♻️ Restart must actually re-exec (see cross-platform fix above). After redeploy, hard-refresh the browser (Ctrl+Shift+R) — old HTML is cached and masks the new UI even when the server is correct.

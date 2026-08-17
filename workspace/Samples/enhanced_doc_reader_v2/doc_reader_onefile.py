@@ -1179,8 +1179,8 @@ HTML_UI = r"""
     font-size: 14px; background: var(--surface-2);
   }
   .search-input:focus { outline: 2px solid var(--accent); border-color: var(--accent); }
-  .mini-btn { padding: 9px 14px; border-radius: 10px; border: 1px solid var(--border-2); background: var(--surface-2); font-size: 13px; font-weight: 600; cursor: pointer; color: var(--primary); }
-  .mini-btn:hover { border-color: var(--accent); background: #eff6ff; }
+  .mini-btn { padding: 10px 16px; border-radius: 10px; border: 1px solid var(--border-2); background: var(--surface-2); font-size: 14px; font-weight: 600; cursor: pointer; color: var(--primary); min-width: 52px; text-align: center; transition: all .2s; }
+  .mini-btn:hover { border-color: var(--accent); background: var(--accent); color: #fff; }
 
   .group {
     border: 1px solid var(--border); border-left: 5px solid var(--gc, #94a3b8);
@@ -1188,13 +1188,13 @@ HTML_UI = r"""
   }
   .group-head {
     display: flex; align-items: center; justify-content: space-between; gap: 10px;
-    padding: 14px 16px; cursor: pointer; background: var(--surface);
+    padding: 14px 16px; cursor: default; background: var(--surface);
   }
   .group-title { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 15px; color: var(--primary); }
   .group-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--gc, #94a3b8); }
   .group-count { font-size: 12px; color: var(--muted); font-weight: 600; }
   .group-tools { display: flex; gap: 8px; align-items: center; }
-  .chev { transition: transform .2s; color: var(--muted); font-size: 13px; }
+  .chev { transition: transform .2s; color: var(--muted); font-size: 13px; cursor: pointer; }
   .group.collapsed .chev { transform: rotate(-90deg); }
   .group-body { padding: 6px 16px 14px; display: grid; gap: 8px; }
   .group.collapsed .group-body { display: none; }
@@ -1203,10 +1203,10 @@ HTML_UI = r"""
     padding: 11px 14px; background: #fff; border: 1px solid var(--border); border-radius: 10px;
   }
   .cat-row label { flex: 1; cursor: default; font-size: 14px; display: flex; align-items: center; gap: 8px; pointer-events: none; }
-  .cat-row { cursor: pointer; }
+  .cat-row { cursor: default; }
   .cat-row input[type=checkbox] { width: 19px; height: 19px; accent-color: var(--gc, #0ea5e9); cursor: pointer; }
   .switch { position: relative; width: 42px; height: 24px; }
-  .switch input { display: none; }
+  .switch input { opacity: 0; width: 100%; height: 100%; cursor: pointer; position: relative; z-index: 2; }
   .slider { position: absolute; inset: 0; background: #cbd5e1; border-radius: 999px; transition: .2s; cursor: pointer; }
   .slider::before { content: ""; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px; background: blue; border-radius: 50%; transition: .2s; }
   .switch input:checked + .slider { background: var(--gc, #0ea5e9); }
@@ -1369,7 +1369,7 @@ const fileNameDiv = document.getElementById('fileName');
 const processBtn = document.getElementById('processBtn');
 const resultsSection = document.getElementById('resultsSection');
 const docCountSpan = document.getElementById('docCount');
-let selectedFile = null;
+let selectedFiles = [];
 let currentSettings = null;
 
 const GROUP_META = {
@@ -1401,28 +1401,30 @@ dropZone.addEventListener('click', () => fileInput.click());
 fileInput.addEventListener('change', () => {
   const files = fileInput.files;
   if (files.length > 0) {
-    selectedFile = files[0];
+    selectedFiles = Array.from(files);
     fileNameDiv.textContent = files.length === 1
-      ? selectedFile.name + ' (' + Math.round(selectedFile.size/1024) + ' KB)'
-      : files.length + ' files selected';
+      ? selectedFiles[0].name + ' (' + Math.round(selectedFiles[0].size/1024) + ' KB)'
+      : files.length + ' files selected (' + Math.round(Array.from(files).reduce(function(a,f){return a+f.size},0)/1024) + ' KB total)';
     processBtn.disabled = false;
     processBtn.textContent = 'Process ' + files.length + ' file(s)';
   } else { resetFileUI(); }
 });
 function resetFileUI(){
   fileNameDiv.textContent = 'No file selected';
-  processBtn.disabled = true; processBtn.textContent = 'Upload & Process'; selectedFile = null;
+  processBtn.disabled = true; processBtn.textContent = 'Upload & Process'; selectedFiles = [];
 }
 
 processBtn.addEventListener('click', async () => {
-  if (!selectedFile) return;
+  if (selectedFiles.length === 0) return;
   processBtn.disabled = true; processBtn.textContent = 'Processing…';
   resultsSection.style.display = 'none';
   const resultContent = document.getElementById('resultContent');
   const resultTitle = document.getElementById('resultTitle');
   const resultStatus = document.getElementById('resultStatus');
   const formData = new FormData();
-  formData.append('file', selectedFile);
+  for (let i = 0; i < selectedFiles.length; i++) {
+      formData.append('file', selectedFiles[i]);
+    }
   try {
     const res = await fetch('/upload', { method: 'POST', body: formData });
     const data = await res.json();
@@ -1570,10 +1572,12 @@ async function loadDocs(){
 dropZone.addEventListener('drop', e => {
   if (e.dataTransfer.files.length) {
     fileInput.files = e.dataTransfer.files;
-    selectedFile = e.dataTransfer.files[0];
-    fileNameDiv.textContent = selectedFile.name + ' (' + Math.round(selectedFile.size/1024) + ' KB)';
-    processBtn.disabled = false; processBtn.textContent = 'Process ' + e.dataTransfer.files.length + ' file(s)';
-    if (e.dataTransfer.files.length === 1) setTimeout(() => processBtn.click(), 100);
+    selectedFiles = Array.from(e.dataTransfer.files);
+    fileNameDiv.textContent = selectedFiles.length === 1
+      ? selectedFiles[0].name + ' (' + Math.round(selectedFiles[0].size/1024) + ' KB)'
+      : selectedFiles.length + ' files selected (' + Math.round(selectedFiles.reduce(function(a,f){return a+f.size},0)/1024) + ' KB total)';
+    processBtn.disabled = false; processBtn.textContent = 'Process ' + selectedFiles.length + ' file(s)';
+    if (selectedFiles.length === 1) setTimeout(() => processBtn.click(), 100);
   }
 });
 
@@ -1600,16 +1604,16 @@ async function openSettings(){
         const checked = catData.enabled ? 'checked' : '';
         const crit = catData.critical ? '<span class="crit">CRITICAL</span>' : '';
         rows += '<div class="cat-row" data-cat="' + catKey + '" data-label="' + (catData.description||catKey).toLowerCase() + '">'
-          + '<label for="cb_' + catKey + '">' + escapeHtml(catData.description) + crit + '</label>'
+          + '<label>' + escapeHtml(catData.description) + crit + '</label>'
           + '<span class="switch"><input type="checkbox" id="cb_' + catKey + '" ' + checked
           + ' onchange="toggleCategory(\'' + groupName + '\',\'' + catKey + '\',this.checked)"><span class="slider"></span></span></div>';
       });
       html += '<div class="group ' + meta.cls + '" data-group="' + groupName + '">'
-        + '<div class="group-head" onclick="this.parentElement.classList.toggle(\'collapsed\')">'
+        + '<div class="group-head">'
         + '<div class="group-title"><span class="group-dot" style="background:' + col + '"></span>' + meta.label + ' <span class="group-count">(' + subs.length + ')</span></div>'
         + '<div class="group-tools"><button class="mini-btn" onclick="event.stopPropagation();groupAll(\'' + groupName + '\',true)">All</button>'
         + '<button class="mini-btn" onclick="event.stopPropagation();groupAll(\'' + groupName + '\',false)">None</button>'
-        + '<span class="chev">▼</span></div></div>'
+        + '<span class="chev" onclick="event.stopPropagation();this.parentElement.parentElement.classList.toggle('collapsed')">▼</span></div></div>'
         + '<div class="group-body">' + rows + '</div></div>';
     }
     if (currentSettings.custom && currentSettings.custom.length) {
@@ -1970,6 +1974,7 @@ def main():
                 body = self.rfile.read(int(self.headers["Content-Length"]))
                 parts = body.split(b"--" + boundary)
 
+                results = []
                 for part in parts:
                     if b"filename=" in part:
                         # Extract filename
@@ -1991,7 +1996,7 @@ def main():
                             safe_doc, rmap, saved_path, safe_path, map_path = process_file(
                                 str(server_path), filename
                             )
-                            self._json(200, {
+                            results.append({
                                 "document_id": safe_doc["document_id"],
                                 "safe_url": f"/documents/{safe_doc['document_id']}/safe",
                                 "original_filename": filename,
@@ -2001,9 +2006,14 @@ def main():
                                 "safe_path": safe_path,
                                 "map_path": map_path
                             })
-                            return
 
-                self._json(400, {"error": "No file uploaded"})
+                if results:
+                    self._json(200, {
+                        "documents": results,
+                        "total_documents": len(results)
+                    })
+                else:
+                    self._json(400, {"error": "No file uploaded"})
             except Exception as e:
                 self._json(500, {"error": str(e)})
 
