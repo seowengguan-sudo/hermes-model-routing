@@ -31,3 +31,23 @@ screening). Embed it as the opening landscape page of the consolidated PDF.
 SimpleDocTemplate cannot easily mix A3 landscape + A4 portrait in one flow. Use BaseDocTemplate with
 two PageTemplates: 'cover' (landscape frame) and 'body' (portrait frame), switch via NextPageTemplate.
 Cover page draws the title + the master PNG (rendered at dpi~170) scaled to fit; body holds the spec.
+
+## Verification Pattern (from session: oakai_mission_executive.py)
+
+When generating any PDF via the OAKAI template engine, verify with this pattern:
+
+1. **Syntax check**: `ast.parse()` on the .py generator file
+2. **Import check**: verify the module loads without errors
+3. **End-to-end**: run `build_document()` → assert output file exists + size > 100 bytes
+4. **PDF header**: assert `open(path, "rb").read(8).startswith(b"%PDF-1.")`  (note: use startswith, not slice compare)
+5. **Content validation**: PyMuPDF opens → extract full text → assert all required sections present
+6. **Semantic checks**: assert key concepts appear in text (e.g. "VTDF", "LTV:CAC > 3:1")
+7. **Cleanup**: delete temp PDF after verification
+
+```python
+# Quick inline verification snippet:
+header = open(result, "rb").read(8)
+assert header.startswith(b"%PDF-1."), f"Bad header: {header}"
+```
+
+Full reference: see `references/two_tier_pdf_strategy.md` (Verification Pattern section)

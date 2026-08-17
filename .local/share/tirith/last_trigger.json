@@ -1,0 +1,41 @@
+{
+  "rule_ids": [
+    "schemeless_to_sink",
+    "curl_pipe_shell"
+  ],
+  "severity": "HIGH",
+  "command_redacted": "sleep 3\n\necho \"=== Health Check ===\"\ncurl -s http://localhost:8765/health\necho \"...",
+  "findings": [
+    {
+      "rule_id": "schemeless_to_sink",
+      "severity": "MEDIUM",
+      "title": "Schemeless URL in sink context",
+      "description": "URL without explicit scheme passed to a command that downloads/executes content",
+      "evidence": [
+        {
+          "type": "url",
+          "raw": "json.tool"
+        }
+      ]
+    },
+    {
+      "rule_id": "curl_pipe_shell",
+      "severity": "HIGH",
+      "title": "Pipe to interpreter: curl | python3",
+      "description": "Command pipes output from 'curl' directly to interpreter 'python3'. Downloaded content will be executed without inspection.\n  Safer: tirith run http://localhost:8765/upload  — or: vet http://localhost:8765/upload  (https://getvet.sh)",
+      "evidence": [
+        {
+          "type": "command_pattern",
+          "pattern": "pipe to interpreter",
+          "matched": "curl -s -X POST http://localhost:8765/upload \\\n  -F \"file=@/tmp/test1.txt\" \\\n  -F \"file=@/tmp/test2.txt\" \\ | python3 -m json.tool"
+        },
+        {
+          "type": "url",
+          "raw": "http://localhost:8765/upload"
+        }
+      ],
+      "mitre_id": "T1059.004"
+    }
+  ],
+  "timestamp": "2026-08-17T01:23:13.531745550+00:00"
+}

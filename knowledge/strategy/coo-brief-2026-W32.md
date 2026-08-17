@@ -40,6 +40,9 @@ Three independent streams. Only Stream A is sequential-critical; B and C must de
 - 1 landing-page tweak suggestion
 
 ### Stream C — Product Discovery & POC Scaffold (local-first)
+
+> **Flagship asset already proven — lead with it, don't bury it.** OAKAI's Document Reader Agent (fully local PII/PHI redaction, standalone server, **18/18 tests passing**) is a *running system*, not slideware. Package it as the lead proof-point this week: it is the concrete, defensible answer to the "can an agent safely touch our data?" objection every enterprise client raises, and it should anchor every discovery call. Treat C1–C5 below as validation/scaffold built *around* this asset — not as the only thing we have to show.
+
 | # | Task | Owner | Cost | Days |
 |---|------|-------|------|------|
 | C1 | Survey 3 target clients (1 mfg, 1 retail, 1 F&B) — pain-points + tools used | Founder | RM60 incentive | 5 |
@@ -137,6 +140,7 @@ graph TD
 | Client surveys completed | 0 | 3 completed (mfg/retail/F&B) | Green = C1 done |
 | Demo scenarios drafted | 0 | 3 written + 1 low-fid mockup | C3+C4 done |
 | Local LLM scaffold | None | Qwen2.5-1.5B + bge-m3 inference running | C5 done |
+| Flagship Doc-Reader asset | Built & verified (18/18) | Demo-packaged + cited as lead proof in B2/B5 | Running system, not slideware |
 | Free-tier AI cost | — | RM0 (local/organic only) | No paid API touched |
 | Total W1 cash | — | ≤ RM215 core (floor) / RM260 max (cap) | Budget held |
 

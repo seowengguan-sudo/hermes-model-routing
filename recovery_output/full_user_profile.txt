@@ -1,0 +1,19 @@
+Environment & working style (carried forward)
+- On Windows, runs Hermes via Docker on WSL2. Technically curious; wants to
+understand the full infra chain (storage, isolation, networking). Security- and
+sandboxing-conscious; wants assurance the agent cannot touch the Windows FS.
+- Values deep architectural understanding + philosophical engagement with
+trade-offs. Prefers to fully understand before committing.
+- WORKFLOW: for substantial builds, present a DESIGN DIGEST + open questions FIRST;
+wait for explicit 'go' before coding. State honest tool/UI boundaries plainly;
+never overclaim. Acknowledge validity of his thinking before counterpoints.
+## Model / cost posture (carried forward)
+- FREE-tier LLMs only by default (OpenRouter, NVIDIA NIM, Nous Portal). PAID
+(Gemini / DeepSeek direct) needs explicit per-use approval.
+- Heaviest free model per task. Master Agent + per-industry Specialist profiles,
+gated learning, anti-hallucination.
+Conversation started: Wednesday, August 12, 2026
+Model: poolside/laguna-s-2.1:free
+Provider: nous
+Platform: tuiAڞ{���`-z
+�����jh�/opt/hermesnoushttps://inference-api.nousresearch.com/v1chat_completionsestimatedprovider_models_apiHermes Meta-Intelligence Architecture AnalysisAڟ�Z�unknown+

@@ -52,6 +52,27 @@ print(wb2['Master Model Matrix'].dimensions)   # throws if corrupt
 - Header row and a sample data cell contain expected values.
 - `ls -la` shows a sane size. A text-corrupted xlsx is usually much larger and either starts with the original ZIP bytes mixed with text or is pure text — both are wrong.
 
+## SpaCy model ordering for NER-based redaction
+When building a redaction engine that combines regex patterns with spaCy NER:
+1. **Run NER FIRST** on the original text — NER needs full sentence context to correctly tag PERSON/ORG/GPE entities
+2. **Then run regex patterns** (SSN, credit card, phone, email) — these are precise and should overwrite any NER-detected tokens
+3. **Then run custom abbreviation matching** — these are user-defined labels (A, B, C) that should not interfere with NER
+
+Running regex first causes NER to see replaced tokens (e.g. `{EMAIL_1}`) instead of original context, leading to misclassification.
+
+## Common NER false positives to filter
+spaCy's `en_core_web_sm` model frequently tags common words as PERSON/ORG/GPE:
+- "Email", "Phone", "Address", "Date" as PERSON
+- "SSN" as ORGANIZATION
+- "Client", "Project" as ORGANIZATION
+
+Filter these with a `NER_SKIP_WORDS` set of ~30 common terms, plus skip single-character entities from PERSON/ORG labels.
+
 ## Related
 - `xlsx` skill (bundled) — covers openpyxl formulas, recalc, financial conventions.
   NOTE: its Prerequisites still say `pip install openpyxl`, which fails under PEP 668, and it lacks the text-writeback corruption warning. Recommend `hermes curator adopt xlsx` to fold this pitfall in.
+
+## References
+- `references/spacy-pip-install-via-uv.md` — Fix for spaCy model install in uv venvs + critical pitfall: spacy download to wrong venv path
+- `references/data-security-governance-policy.md` — 10 PII/PHI/financial exclusion categories for document readers
+- See also: `mlops/local-document-reader-agent` skill for a full local document reader with PII redaction built on these venv patterns.

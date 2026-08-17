@@ -1,0 +1,10 @@
+anydoc/__init__.py,sha256=qr2cLZZ_JwdMzRa51ltnH_1tD8Rf-sPV7UnO0o54tAk,1341
+anydoc/_anydoc.abi3.so,sha256=7kVOPCNolZzV7IgWgZmnrjakFUrbfx_zHjqihjkkSmk,8045720
+anydoc/_anydoc.pyi,sha256=JhAzl3eO7IBVtuUpp7dDI5NttlO47-9grCIfMXt652M,7035
+anydoc/py.typed,sha256=AbpHGcgLb-kRsJGnwFEktk7uzpZOCcBY74-YBdrKVGs,1
+firecrawl_anydoc-0.1.6.dist-info/INSTALLER,sha256=5hhM4Q4mYTT9z6QB6PGpUAW81PGNFrYrdXMj4oM_6ak,2
+firecrawl_anydoc-0.1.6.dist-info/METADATA,sha256=ZIQteKBvA6gX6m0KV6XompYQFoM31seXvNRwQqGhByA,5579
+firecrawl_anydoc-0.1.6.dist-info/RECORD,,
+firecrawl_anydoc-0.1.6.dist-info/REQUESTED,sha256=47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU,0
+firecrawl_anydoc-0.1.6.dist-info/WHEEL,sha256=kHG4VffTimG9L7gtPd2ogTTLXk1ANydRQaNbDv8XsX0,145
+firecrawl_anydoc-0.1.6.dist-info/sboms/anydoc-python.cyclonedx.json,sha256=RU__JJv0rVuxNzqf8CLklgvv6lrPH6kqYSHdOshOt7Y,141675

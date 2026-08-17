@@ -30,8 +30,7 @@ openpyxl only** — writing plain text/CSV to a `.xlsx` corrupts the binary.)
 2. Change via openpyxl (xlsx) / reportlab build (pdf). Never hand-edit binary xlsx
    as text, and never re-save xlsx by writing a TSV/plain-text blob.
 3. **VERIFY before claiming done:**
-   - xlsx: reopen with openpyxl; assert sheets/cols/rows; spot-check key cells
-     (e.g. a known SEQ_* value, a capacity int).
+   - xlsx: **(a)** run `xlsx/scripts/recalc.py <file>` first (mandatory — computes all formulas via LibreOffice headless; assert `status: success` + `total_errors: 0`); **(b)** only THEN reopen with openpyxl (`data_only=True`) to assert sheets/cols/rows and spot-check key computed values. Skipping (a) means you can only verify formula *strings*, not *evaluated values* — openpyxl writes formulas as strings with no cached values.
    - pdf: pymupdf open → assert page count + `not doc.is_closed`; render the
      *densest* pages to PNG; **vision_analyze the PNG** to confirm no text
      overlap / cutoff / column collision.
@@ -93,8 +92,16 @@ overlap bugs are invisible in text extraction but visible in the image.
   architecture (swap for other projects).
 - `references/reportlab_flowable_pitfalls.md` — the recurring Flowable/diagram bugs
   (`tuple(Color)` TypeError, double `HexColor(Color)`, positional `Flowable.__init__`,
-  `\\n` label wrapping, closed-loop arc math) + the non-negotiable render→PNG→vision check.
+  `\\\\n` label wrapping, closed-loop arc math) + the non-negotiable render→PNG→vision check.
 - `references/oakai-template-engine.md` — for **branded OAKAI reports** (cover page,
   TOC, footer rules, brand palette), use the custom template engine at
   `skills/PDF/oakai_pdf_template.py` instead of the generic helpers here. This is a
   user-owned skill — read it for the API and style rules, but do not edit it.
+- `references/excel-formula-linkage-pitfall.md` — critical session-specific detail:
+  the most common Excel formula-failure class is cross-sheet reference errors (wrong
+  column letter, wrong row number, referencing a sheet that doesn't exist). A Python
+  verification script that only checks formula *string presence* (e.g.
+  `cell.value.startswith("=SUM")`) proves nothing about evaluation — openpyxl writes
+  formulas as strings with no cached values. The ONLY reliable test is LibreOffice's
+  headless recalculation via `scripts/recalc.py` (from the `xlsx` skill). See the
+  pitfall entry below for the exact failure pattern and the mandatory 3-step guard.

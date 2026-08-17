@@ -1,5 +1,5 @@
 # PENSOLAR - Compressed Operating-Model Distillation (living)
-Last pull: 2026-08-13 (run 3) | Vertical: Solar PV integration (residential + C&I), Penang / Peninsular MY
+Last pull: 2026-08-13 (run 4) | Vertical: Solar PV integration (residential + C&I), Penang / Peninsular MY
 Scope: workflow, regulatory gates, cost structure, pain points. Maintain <=32KB.
 Source base (run 1): SEDA NEM 3.0 [1], Northern Solar [2], Trexon [3], Eigen EPC [4], Ember [5], IEA-PVPS MY2025 [6].
 Source base (run 2): Homi Solar ATAP guide [S1], solaratap.com.my process guide [S2], SEDA ATAP reportal [S3],
@@ -8,6 +8,8 @@ Trexon O&M service [S8], CommercialSolarGuy O&M [S9], SolarPowerEurope GMO [S10]
 Source base (run 3): Sunview SELCO-BESS 2026 [R1], Shu Pin & Assoc standby/BESS legal [R2], buySolar ATAP FAQ [R3],
 Trexon install timeline [R4], Northern Solar commercial setup [R5], SolarDir RPVSP count [R6],
 Northern Solar C&I cost [R7], Trexon C&I cost [R8].
+Source base (run 4): Unitrade inverter retail [T1], CGC GTFS-i 5.0 [T2], MGTC/IEA GTFS [T3],
+PlanRadar/CII rework benchmark [T4], SEDA Qualified Person directory [T5].
 
 ## 1. Regulatory frame (MY, Peninsular)
 - SEDA = Implementing Agency; Energy Commission (EC) regulates; TNB = grid/distribution licensee.
@@ -153,10 +155,43 @@ P6 O&M/After-sales 20-25yr: field cleaning/inspection/monitoring; admin AMC, SLA
 - Net 2026 rule: SELCO 72kWp–1MWp EXEMPT standby + no BESS; >1MWp RM12/kWp/mo + mandatory BESS
   >1MWac. See corrected §3 block. Re-run SELCO ROI with the BANDED rule, not the run-2 flat RM14.
 
+### 6e. Run-4 fills (2026-08-13)
+### 6e-a. Inverter replacement RM + AMC sinking fund (KPI: callback cost) — was gap 3, FILLED
+- MY residential/string/hybrid inverter retail RM2,500–10,000 by capacity/brand; typical life 10–15yr,
+  warranty 5–10yr (extendable) [T1]. Central (>100kW) REPLACEMENT RM NOT yet quoted locally.
+- IMPLICATION: residential inverter sinking fund = RM2,500–10,000 at yr 10–12 → set aside ~RM210–830/yr,
+  which sits inside the RM500–900/yr AMC tier (run-2 §3b). C&I: use EU central-unit service EUR2,000–3,000/yr
+  (>1MW) [S7] as proxy and provision an explicit central-unit replacement reserve in the AMC. Inverter is the
+  #1 after-sales dispute item (run-2) → hard-code the sinking-fund line into every AMC quote.
+### 6e-b. Green financing GTFS-i 5.0 (KPI: cost/kW + closure) — was gap 4, FILLED
+- GTFS-i 5.0 LIVE: RM1B facility; 2% p.a. interest/profit subsidy for first 7 years + 60% govt guarantee;
+  window to 31 Dec 2026 or until RM1B approved, whichever earlier [T2][T3]. (GTFS 4.0, Jul 2023, RM1B preceded.)
+- IMPLICATION: C&I clients under ATAP/SELCO can cut effective financing cost via 2% subsidy + 60% guarantee →
+  lowers effective cost/kW and lifts deal closure. TIME-SENSITIVE: route C&I clients to GTFS-i 5.0 NOW before
+  31 Dec 2026 window. Residual: tenor + eligible ATAP project types not fully published (→ §7 gap 4).
+### 6e-c. Rework cost % (KPI: cost/kW + quality) — was gap 5, FILLED (proxy)
+- Construction benchmark: direct rework 5–10% of total project cost (CII/PlanRadar cluster 4–10%); design-related
+  errors 1.5–6.9% of contract [T4]. Solar-PV-specific figure absent.
+- IMPLICATION: size a ~5% contract rework reserve on fixed-price quotes; gate design QA at P2 (Competent-Person
+  design review) to pre-empt commissioning rework (pain point #5). Design-error share is preventable → enforce
+  design sign-off checklist before P3. Residual: instrument MY solar-PV rework rate in-house (→ §7 gap 5).
+### 6e-d. CP / PVCP sign-off gate (KPI: timeline + cost/kW) — was gap 1, PARTIAL
+- SEDA Qualified Person directory confirms a DISTINCT GCPV Systems Design Qualified Person (QP/PVCP) class
+  (cert sequence SPCPDN…), separate from the 412 RPVSP COMPANIES [T5]. Directory is consent-gated → public
+  total incomplete (displayed sample reaches SPCPDN00211 with gaps).
+- IMPLICATION: per-individual QP sign-off is a SCARCE, named resource gate, NOT the same as installer count.
+  PM must schedule QP sign-off as a tracked resource (cf. §6b CP note). The 2027–29 constraint thesis (run-3)
+  holds at the INDIVIDUAL-QP level, not the company level. Residual: exact national QP count + queue wait
+  still unpublished (→ §7 gap 1).
+
 ## 7. Open gaps (feed next run, priority order)
-1. Certified Competent Person (CP) individual count + sign-off queue wait (Peninsular MY) — the
-   real 2027–29 constraint is CP throughput, not installer count (412 RPVSPs). KPI: timeline + cost/kW.
-2. CAS rejection / derate rate by capacity band (72kW–1MW) — drives redesign loops. KPI: timeline.
-3. MY-market inverter replacement RM quote (string vs central) + AMC sinking-fund sizing. KPI: callback cost.
-4. Green-financing / GTFS-successor terms for C&I under ATAP (tenor, rate). KPI: cost/kW + closure.
-5. Rework cost % of contract when design errors surface at commissioning. KPI: cost/kW + quality.
+1. Exact count of individual GCPV Design QPs (PVCPs), Peninsular MY + typical sign-off queue wait —
+   directory consent-gated, true total unknown [T5]. KPI: timeline adherence + install cost/kW.
+2. CAS rejection / derate rate by capacity band (72kW–1MW) — no public figure found this run.
+   KPI: timeline adherence.
+3. MY-market C&I central-inverter replacement RM quote (>100kW) — only string figure RM2,500–10,000
+   found [T1]. KPI: after-sales callback cost.
+4. GTFS-i 5.0 tenor + eligible ATAP/SELCO project types — window closes 31 Dec 2026 [T2][T3].
+   KPI: install cost/kW / closure (TIME-SENSITIVE).
+5. MY solar-PV-specific rework rate (construction proxy 5% used) — instrument in-house [T4].
+   KPI: install cost/kW / quality.

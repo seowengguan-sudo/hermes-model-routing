@@ -1,0 +1,19 @@
+[{
+  "action": "open",
+  "url": "file:///opt/data/workspace/hermes-agent-architecture.html"
+}, {
+  "action": "wait",
+  "for": "networkidle"
+}, {
+  "action": "screenshot",
+  "fullPage": true
+}, {
+  "action": "open",
+  "url": "file:///opt/data/workspace/doc-reader-architecture.html"
+}, {
+  "action": "wait",
+  "for": "networkidle"
+}, {
+  "action": "screenshot",
+  "fullPage": true
+}]

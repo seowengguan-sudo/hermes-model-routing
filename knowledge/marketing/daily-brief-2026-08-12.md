@@ -1,85 +1,80 @@
-# 📈 Marketing Brief — Daily Digest #2 (2026-08-12)
-*Driving visibility for OAKAI — AI Solutions Provider for manufacturing, retail, F&B, admin, procurement*
+# 📈 Marketing Brief — 2026-08-12 (Tue, MYT)
+*OAKAI SDN BHD — AI Ops Solutions for Manufacturing · Retail · F&B · Admin · Procurement*
+*Audience: ops managers, plant supervisors, SME owners, procurement leads (MY / SG / IN)*
 
-> **Yesterday's wins**: Company name locked (OAKAI SDN BBD), domain oakai.com.my reserved, LinkedIn profile drafted with banner concept, Day 1 origin post written.
-> **Today's focus**: Publish Day 1 post, verify profile assets, join groups, begin engagement loop.
+> **Baseline (carried from Day 1)**: Name locked, domain oakai.com.my reserved, LinkedIn profile + banner drafted, origin post written. Today = make it live + start the engagement flywheel.
+> **One constraint**: Registration pending, bank pending. Sell capability + credibility, NOT "buy now." Every asset drives to the lead magnet, not a checkout.
 
 ---
 
-## ✅ TODAY'S ACTION CHECKLIST
+## ✅ TODAY'S ACTION CHECKLIST (execute in order)
 
-| # | Task | Owner | Deadline | Status | Notes |
-|---|------|-------|----------|--------|-------|
-| 1 | Verify LinkedIn profile live + vanity URL `linkedin.com/in/oakai-asia` claimed | Marketing | 06:30 MYT | ⬜ | Test link click-through on desktop + mobile |
-| 2 | Upload banner (tao gradient + "Autonomous Ops") + profile photo | Design | 07:00 MYT | ⬜ | Banner: dark navy, bold teal accent, white text — high contrast |
-| 3 | Publish "Why I left ERPs" origin post (caption below) | Marketing | 07:30 MYT | ⬜ | Pin to profile after 24h engagement check |
-| 4 | Join 5 target groups + comment helpfully on 5 posts in each | Marketing | 09:00 MYT | ⬜ | No self-promo in comments — value-add only |
-| 5 | Boost Day 1 post with RM10 test budget (geotarget: MY + SG + IN ops managers) | Marketing | 10:00 MYT | ⬜ | Track CTR + engagement vs organic baseline |
+| # | Task | Owner | Deadline (MYT) | Verify |
+|---|------|-------|----------------|--------|
+| 1 | LinkedIn profile LIVE + vanity URL `linkedin.com/in/oakai-asia` claimed; banner (navy/teal, white bold text) + logo photo uploaded | Marketing | 07:00 | Click link on desktop + mobile; banner reads at thumbnail size |
+| 2 | Publish origin post "Why I left ERPs" (caption below) — pinned after 24h | Marketing | 07:30 | Post visible publicly; first comment seeded |
+| 3 | Join 5 target groups (see §3); drop 5 value-add comments in EACH before any self-promo | Marketing | 09:30 | 25 comments logged, zero links, zero pitch |
+| 4 | RM10 boost on origin post — geo MY/SG/IN, role: ops/procurement manager | Marketing | 10:30 | Campaign live; UTM-tagged Carrd link in comments |
+| 5 | Stand up Carrd landing page shell + email-capture gate for lead magnet (copy only, PDF later) | Marketing | EOD | Draft URL live, form connected to capture |
 
 ---
 
 ## 📝 READY-TO-POST LINKEDIN CAPTION
 
-> 🚧 Why I left traditional ERPs behind — and started building AI agents instead
+> 🚧 Why I walked away from traditional ERPs — and started building AI agents instead.
 >
-> I spent 12 years watching manufacturing floors lose 30%+ productivity to manual data entry between SAP, Excel, and WhatsApp.
+> I spent 12 years watching factory floors lose 30%+ productivity to manual data entry between SAP, Excel, and WhatsApp.
 >
-> Traditional ERP promised to fix this. It didn't.
+> ERP promised to fix this. It didn't.
 >
-> Here's why AI agents are different:
+> Here's the difference with AI agents:
+> 🔧 They read ANY system — PDF, email, chat, scanned invoice. No rip-and-replace.
+> 🔧 They act on exceptions, not rigid pre-built workflows.
+> 🔧 Your data stays isolated — no black-box sharing with third parties.
 >
-> 🔧 They don't need perfect integrations — they read any system (PDF, email, chat, scanned invoice)
-> 🔧 They act on exceptions, not workflows you pre-program
-> 🔧 They isolate your data — no black-box sharing with third parties
+> At OAKAI we're building the first AI ops layer that works *with* your existing systems — safely.
 >
-> Starting @OAKAI, we're building the first AI ops layer that works *with* your existing systems — safely.
->
-> If you're managing production, retail, or service operations and tired of "the system says yes, reality says no"... let's talk.
+> If you run production, retail, or service ops and you're tired of "the system says yes, reality says no" — let's talk.
 >
 > #AIinManufacturing #DigitalTransformation #OpsAI #AIAgents #MalaysiaTech
 
-**Visual**: Figma mockup — left: chaotic spreadsheet + WhatsApp screenshots; right: clean ops dashboard. High-contrast teal/white palette.
-
-**Hashtag strategy**: 3 primary (industry) + 2 secondary (method) + 1 branded. Post at 07:30 MYT (commute window). First comment: ask "What's your biggest ops data leak?" to seed replies.
+**Visual**: Figma mock — left: chaos (spreadsheet + WhatsApp shots); right: clean ops dashboard. High-contrast teal/white.
+**Hashtag strategy**: 3 industry (#AIinManufacturing #DigitalTransformation #MalaysiaTech) + 1 method (#OpsAI) + 1 capability (#AIAgents). Post 07:30 (commute). First comment: *"What's your biggest ops data leak right now?"* — seed replies, then reply to each within 2h.
 
 ---
 
 ## 🔍 GROUPS TO JOIN + ENGAGEMENT RULE
 
-1. **AI Malaysia** (4.2k) — `linkedin.com/groups/...` — general AI discussion
-2. **Malaysian Manufacturing Network** (1.8k) — ops pain points
-3. **Retail Operations Asia** (900+) — retail-specific
-4. **F&B Tech Malaysia** (1.1k) — food & beverage
-5. **SME Digitalization Malaysia** (3.4k) — decision-makers
+1. **AI Malaysia** (~4.2k) — general AI, local buyers
+2. **Malaysian Manufacturing Network** (~1.8k) — ops pain, decision-makers
+3. **Retail Operations Asia** (~900) — retail-specific
+4. **F&B Tech Malaysia** (~1.1k) — food & beverage
+5. **SME Digitalization Malaysia** (~3.4k) — owners + procurers
 
-**Engagement rule**: Before posting your own content, drop 5 value-adding comments in each group. No links. No self-promo. Answer a question or share a quick tactic. This buys social capital for when the Day 3 use-case post drops.
+**Engagement rule (hard)**: 5 helpful comments per group BEFORE posting anything of ours. No links. No self-promo. Answer a question or drop one tactic. This banks social capital for the Aug 13 use-case post. Cap own posts in groups at 1/week.
 
 ---
 
 ## 🎯 CONTENT THEME FOR TOMORROW (Aug 13)
 
-**Use Case Spotlight** — *"A day in the life of an AI ops agent"*
-
-Hook: a 3-frame carousel showing an agent handling a supplier PO exception autonomously (email → extraction → ERP entry → confirmation).
-Angle: concrete workflow, not abstract AI. Shows data isolation in action (agent never sends data offsite).
-Lead-in to lead magnet (audit checklist).
+**Use-Case Spotlight — "A day in the life of an AI ops agent."**
+3-frame carousel: supplier PO exception handled autonomously (email → extract → ERP entry → confirm). Concrete workflow, not abstract AI. Show data isolation in action (agent never sends data offsite). Lead into the audit checklist magnet.
 
 ---
 
-## 🧲 LEAD MAGNET (Today)
+## 🧲 LEAD MAGNET (today)
 
-**"AI Ops Audit Checklist"** — 1-page PDF, 12 diagnostic questions ("Do you reconcile invoices by hand?", "Do data lives in 3+ disconnected systems?"). Gated behind email capture on a Carrd landing page. Target: ops managers + plant supervisors.
-
-Deadline: build landing page copy by Aug 14 EOD; gate the PDF.
+**"AI Ops Audit Checklist"** — 1-page PDF, 12 yes/no diagnostics ("Reconcile invoices by hand?", "Data lives in 3+ disconnected systems?"). Gated on Carrd email capture. Target: ops managers + plant supervisors.
+**Build plan**: Carrd shell + copy today (§5); design PDF by Aug 14 EOD; gate + UTM by Aug 15.
 
 ---
 
 ## 📅 TOMORROW'S MARKETING PRIORITY
 
-1. Draft + publish Aug 13 use-case carousel (3 frames) before 09:00 MYT.
-2. Capture Day 1 metrics: reach, saves, profile views, CTR on boost, new connection requests.
-3. Script Day 3 technical-edge post ("Data isolation isn't optional") — outline only, write Aug 14.
-4. Set up UTM tracking on Carrd link — `utm_source=linkedin&utm_medium=social&utm_campaign=day1post`.
+1. Publish Aug 13 use-case carousel before 09:00 MYT.
+2. Pull Day 1 metrics: reach, saves, profile views, boost CTR, connection requests.
+3. Script Aug 14 technical post ("Data isolation isn't optional") — outline only.
+4. Wire UTM on Carrd: `utm_source=linkedin&utm_medium=social&utm_campaign=day1post`.
 
 *Generated by `marketing-advisor-daily` cron (Mon–Sat 06:00 MYT) → `/opt/data/knowledge/marketing/`*
 *Next brief: 2026-08-13 06:00 MYT*

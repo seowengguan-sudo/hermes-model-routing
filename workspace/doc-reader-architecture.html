@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doc Reader Project Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'JetBrains Mono',monospace;background:#020617;min-height:100vh;padding:2rem;color:#fff;}
+.c{max-width:1200px;margin:0 auto;}
+.h{margin-bottom:1.5rem;}
+.hr{display:flex;align-items:center;gap:1.75rem;}
+.pulse{width:14px;height:14px;background:#06dafa;border-radius:50%;box-shadow:0 0 10px #06dafa;animation:p 2s infinite;}
+@keyframes p{0%,100%{opacity:1}50%{opacity:.3}}
+h1{font-size:1.5rem;font-weight:700;letter-spacing:-.025em;}
+.sub{color:#94a3b8;font-size:.8em;margin-left:1.75rem;}
+.diag{background:rgba(15,23,42,.6);border-radius:1rem;border:1px solid #1e293b;padding:1.25rem;overflow-x:auto;margin-bottom:1.5rem;}
+svg{width:100%;min-width:1180px;display:block;}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem;margin-top:1.5rem;}
+.card{background:rgba(15,23,42,.6);border-radius:.75rem;border:1px solid #1e293b;padding:1.25rem;}
+.ch{display:flex;align-items:center;gap:.6rem;margin-bottom:.75rem;}
+.cd{width:10px;height:10px;border-radius:50%;}
+.cd.cy{background:#06dafa}.cd.em{background:#34d399}.cd.vi{background:#a78bfa}.cd.am{background:#fbbf24}.cd.lv{background:#fb923c}
+.ul{list-style:none;color:#cbd5e1;font-size:.78rem;line-height:1.5;}
+.ul li{margin-bottom:.4rem}
+.fot{text-align:center;margin-top:1.5rem;color:#64748b;font-size:.75rem;}
+.lblt{font-size:9.5px;font-weight:600;fill:#fff;}
+.lbls{font-size:8px;fill:#cbd5e1;}
+</style></head><body>
+<div class="c">
+<div class="h"><div class="hr"><div class="pulse"></div><h1>Document Reader Project Architecture</h1></div>
+<p class="sub">Local PII/PHI redaction. Live: pid 16400 on 127.0.0.1:8765. Zero egress, no model calls.</p></div>
+
+<div class="diag"><svg viewBox="0 0 1220 700">
+<defs>
+<marker id="a" markerWidth="9" markerHeight="6" refX="9" refY="3" orient="auto"><polygon points="0 0,9 3,0 6" fill="#06dafa"/></marker>
+<marker id="b" markerWidth="9" markerHeight="6" refX="9" refY="3" orient="auto"><polygon points="0 0,9 3,0 6" fill="#a78bfa"/></marker>
+<marker id="d" markerWidth="9" markerHeight="6" refX="9" refY="3" orient="auto"><polygon points="0 0,9 3,0 6" fill="#fb7185"/></marker>
+<pattern id="g" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width=".5"/></pattern>
+</defs>
+<rect width="100%" height="100%" fill="url(#g)" />
+
+<!-- entry points: 3 equal boxes across top -->
+<rect x="120" y="75" width="140" height="70" rx="6" fill="#0ea5e9" fill-opacity="0.75" stroke="#06dafa" stroke-width="2"/>
+<text x="190" y="102" class="lblt" text-anchor="middle">CLI</text>
+<text x="190" y="117" class="lbls" text-anchor="middle">--process {file}</text>
+
+<rect x="310" y="75" width="140" height="70" rx="6" fill="#0ea5e9" fill-opacity="0.75" stroke="#06dafa" stroke-width="2"/>
+<text x="380" y="102" class="lblt" text-anchor="middle">HTML UI</text>
+<text x="380" y="117" class="lbls" text-anchor="middle">GET / (root)</text>
+
+<rect x="500" y="75" width="140" height="70" rx="6" fill="#0ea5e9" fill-opacity="0.75" stroke="#06dafa" stroke-width="2"/>
+<text x="570" y="102" class="lblt" text-anchor="middle">HTTP API</text>
+<text x="570" y="117" class="lbls" text-anchor="middle">port 8765</text>
+
+<rect x="690" y="75" width="140" height="70" rx="6" fill="#0ea5e9" fill-opacity="0.75" stroke="#06dafa" stroke-width="2"/>
+<text x="760" y="102" class="lblt" text-anchor="middle">RELAY</text>
+<text x="760" y="117" class="lbls" text-anchor="middle">port_relay.py</text>
+
+<!-- arrows from entry points to engine -->
+<line x1="190" y1="145" x2="280" y2="180" stroke="#06dafa" stroke-width="1.8" marker-end="url(#a)"/>
+<text x="235" y="165" fill="#06dafa" font-size="7">process request</text>
+<line x1="380" y1="145" x2="520" y2="180" stroke="#06dafa" stroke-width="1.8" marker-end="url(#a)"/>
+<text x="450" y="165" fill="#06dafa" font-size="7">GET /process</text>
+<line x1="570" y1="145" x2="660" y2="190" stroke="#06dafa" stroke-width="1.8" marker-end="url(#a)"/>
+<text x="615" y="175" fill="#06dafa" font-size="7">POST /process</text>
+<line x1="760" y1="145" x2="820" y2="205" stroke="#06dafa" stroke-width="1.8" marker-end="url(#a)"/>
+<line x1="950" y1="145" x2="1020" y2="205" stroke="#06dafa" stroke-width="1.8" marker-end="url(#a)"/>
+
+<!-- engine boundary: x=100 width=1020 → stages inset 20px padding -->
+<rect x="100" y="175" width="1020" height="230" rx="14" fill="none" stroke="#34d399" stroke-width="1.5" stroke-dasharray="8,4"/>
+<text x="110" y="193" fill="#34d399" font-size="11" font-weight="600">REDACTION ENGINE — doc_reader_onefile.py (single 88KB file)</text>
+
+<!-- 3 evenly-spaced pipeline stages (x: 120, 460, 800; each 320 wide → gaps 20px) -->
+<rect x="120" y="205" width="320" height="48" rx="6" fill="#ef4444" fill-opacity="0.75" stroke="#fb7185" stroke-width="2"/>
+<text x="280" y="230" class="lblt" text-anchor="middle">EXTRACTION</text>
+<text x="280" y="245" class="lbls" text-anchor="middle">PDF DOCX XLSX PPTX CSV RTF HTML JSON</text>
+
+<rect x="460" y="205" width="320" height="48" rx="6" fill="#a78bfa" fill-opacity="0.75" stroke="#a78bfa" stroke-width="2"/>
+<text x="620" y="230" class="lblt" text-anchor="middle">REDACTION</text>
+<text x="620" y="245" class="lbls" text-anchor="middle">regex + sklearn NER + abbreviations</text>
+
+<rect x="800" y="205" width="320" height="48" rx="6" fill="#f59e0b" fill-opacity="0.75" stroke="#fbbf24" stroke-width="2"/>
+<text x="960" y="230" class="lblt" text-anchor="middle">SAFE OUTPUT</text>
+<text x="960" y="245" class="lbls" text-anchor="middle">safe JSON + var map → documents_safe/</text>
+
+<!-- inter-stage arrows (precise: right edge→left edge of next stage) -->
+<line x1="440" y1="230" x2="460" y2="230" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#b)"/>
+<text x="450" y="224" fill="#a78bfa" font-size="7">extracted text</text>
+<line x1="778" y1="230" x2="800" y2="230" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#b)"/>
+<text x="789" y="224" fill="#a78bfa" font-size="7">redacted vars</text>
+
+<!-- safe output → data dirs arrow -->
+<line x1="960" y1="253" x2="610" y2="310" stroke="#fbbf24" stroke-width="1.8" marker-end="url(#a)"/>
+<text x="790" y="283" fill="#fbbf24" font-size="7.5">safe JSON + maps</text>
+
+<!-- data dirs row (y=420, below engine boundary which ends at y=405) -->
+<rect x="100" y="420" width="320" height="80" rx="8" fill="#a78bfa" fill-opacity="0.75" stroke="#a78bfa" stroke-width="2"/>
+<text x="260" y="445" class="lblt" text-anchor="middle">PROJECT-DATA (portable)</text>
+<text x="260" y="462" class="lbls" text-anchor="middle">/projects/doc_reader/data/ — auto-detected</text>
+
+<rect x="460" y="420" width="320" height="80" rx="8" fill="#f59e0b" fill-opacity="0.75" stroke="#fbbf24" stroke-width="2"/>
+<text x="620" y="445" class="lblt" text-anchor="middle">CONTAINER-DATA (runtime)</text>
+<text x="620" y="462" class="lbls" text-anchor="middle">/opt/data/data/ — current live path</text>
+
+<rect x="820" y="420" width="280" height="80" rx="8" fill="#ef4444" fill-opacity="0.75" stroke="#fb7185" stroke-width="2"/>
+<text x="960" y="445" class="lblt" text-anchor="middle">RELAY</text>
+<text x="960" y="462" class="lbls" text-anchor="middle">port_relay.py :8765→:8766</text>
+<text x="960" y="478" class="lbls" text-anchor="middle">relay_server.py :8765→:8766</text>
+
+<!-- security boundary -->
+<rect x="30" y="520" width="1160" height="80" rx="10" fill="none" stroke="#fb7185" stroke-width="1.5" stroke-dasharray="8,4"/>
+<text x="610" y="545" fill="#fb7185" font-size="11" font-weight="600" text-anchor="middle">SECURITY BOUNDARY — 100% LOCAL · zero egress · no model calls</text>
+<text x="610" y="563" fill="#9ca3af" font-size="8" text-anchor="middle">Windows browser → http://localhost:8765 (WSL2 forwards) or SSH -L 8765:localhost:8765</text>
+</svg></div>
+
+<div class="cards">
+<div class="card"><div class="ch"><div class="cd em"></div><h3 style="font-size:14px">Live Run State</h3></div>
+<ul class="ul">
+<li>• Process: pid 16400 — doc_reader_onefile.py</li>
+<li>• Listening: 127.0.0.1:8765 (container loopback)</li>
+<li>• venv: /opt/data/.venv-docreader (py3.13 + spacy en-core-web-sm)</li>
+<li>• 18/18 test cases pass</li></ul></div>
+<div class="card"><div class="ch"><div class="cd vi"></div><h3 style="font-size:14px">File Layout</h3></div>
+<ul class="ul">
+<li>• /opt/data/projects/doc_reader/ — engine source</li>
+<li>• /opt/data/data/ — runtime uploads, documents_safe, redaction_maps</li>
+<li>• /opt/data/scripts/ — shared cron scripts (canonical home)</li>
+<li>• deploy_doc_reader.sh — portable venv + CLI/API/UI modes</li></ul></div>
+<div class="card"><div class="ch"><div class="cd lv"></div><h3 style="font-size:14px">Redaction Categories</h3></div>
+<ul class="ul">
+<li>• PII · PHI · Financial · Credentials</li>
+<li>• Corporate · National-Security · Industry</li>
+<li>• Infrastructure · Behavioral · Composite</li>
+<li>• reversible via redaction_maps/ + safe JSON var map</li></ul></div>
+</div>
+<p class="fot">Document Reader Project · generated 2026-08-16 from live system inspection</p>
+</div></body></html>

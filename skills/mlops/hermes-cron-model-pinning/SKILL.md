@@ -98,7 +98,28 @@ Pitfall #14 — `script` is a path, not a command
 `bash /opt/data/workspace/x.conf` is read as the literal filename `bash /opt/data/workspace/x.conf`
 joined under `scripts/` → not found. Never embed `bash `, args, or flags in the field.
 
-Pitfall #3 — a non-path string in `script`
+## Pitfall #3a — post-restructure script drift (doc_reader relocation, verified 2026-08-16)
+
+After a project tree restructure, `no_agent` cron jobs can silently start failing if
+their `script` field points at a file that moved outside the containment guard. Three
+jobs were caught in this state:
+
+| Job | Broken `script` | Failure | Fix |
+|------|-----------------|---------|-----|
+| `gateway-watchdog` | `/opt/data/projects/doc_reader/gateway_watchdog.sh` (absolute) | `Blocked: script path resolves outside the scripts directory` every 2 min | relocate + set basename |
+| `daily-git-push` | `auto_git_push.sh` (relative) | resolves to `/opt/data/scripts/auto_git_push.sh` → missing | relocate file into `scripts/` |
+| `monthly-cleanup` | `cleanup.sh` (relative) | same — missing on disk; fires 2026-09-01 | relocate file into `scripts/` |
+
+**Relocate, do not symlink** — the containment guard resolves the path then performs
+`relative_to(scripts_dir_resolved)`, so a symlink escaping `scripts/` can still be rejected.
+Copy the real file in and leave the original as-is (some scripts are internally
+referenced by other scripts living inside `scripts/`). Then set `script` to the
+**relative basename only** (e.g. `gateway_watchdog.sh`) and re-verify with
+`python3 skills/mlops/hermes-cron-model-pinning/scripts/verify_cron_script_field.py`.
+Full per-file state, exact paths, and the precise block message are in
+`references/doc-reader-cron-script-relocation.md`.
+
+## Pitfall #3 — a non-path string in `script`
 Do NOT put an `echo`/note stub in `script`. Only real script files (or empty string) belong
 there. A stub produces a permanent per-tick error and pollutes the agent prompt.
 
@@ -258,6 +279,31 @@ existed on disk but were removed from git's index. Recovery:
 `git checkout 54c4651 -- knowledge/ skills/ workspace/ cron/ memories/`.
 Always verify `git ls-files | wc -l` matches expected file count before/after sync.
 
+## Pitfall #16 — Dead messaging gateway in a combined dashboard+gateway container
+When `hermes gateway status` reports the gateway is not running after a container
+restart, the s6 service slot (`/run/service/gateway-default/`) was not recreated
+by `container_boot.py`. Root cause: this container runs `hermes dashboard` as
+PID 1, and `container_boot.py` skips gateway registration for dashboard
+containers (to avoid log-lock contention in multi-container setups). In a
+single-container deployment this is wrong — the gateway slot is never created.
+
+**Fix**: A recurring `gateway-watchdog` cron job (every 2 min, `no_agent=true`)
+detects the missing/down service slot, registers it via
+`S6ServiceManager.register_profile_gateway`, ensures `gateway_state.json` has
+`desired_state: "running"`, then triggers `s6-svscanctl -a` + `s6-svc -u` to
+start it. See `references/gateway-watchdog-recovery.md` for the full script,
+creation command, key paths, and verification recipe.
+
 ## Related
 `hermes cron edit --help` (all editable fields), `cronjob` tool (list/run/remove),
-`model-selection-policy` (covers model *selection*; this skill covers *pinning* + restart recovery). See `references/startup-enforcement-scripts.md` for script internals. `references/cron-script-runner-mechanics.md` documents the `script` field resolver + containment guard + extension→interpreter rule (covers Mode B / "Script not found" from a full-command `script`).
+`model-selection-policy` (covers model selection; this skill covers pinning +
+restart recovery). See `references/startup-enforcement-scripts.md` for script
+internals. `references/cron-script-runner-mechanics.md` documents the script
+field resolver. `references/gateway-watchdog-recovery.md` documents the
+gateway-auto-restart watchdog pattern for single-container dashboard+gateway
+setups. `references/doc-reader-cron-script-relocation.md` documents the verified
+relocation recipe for `no_agent` cron scripts that drifted after a project-tree
+restructure (containment-guard fix for gateway-watchdog / daily-git-push /
+monthly-cleanup). `references/wsl2-docker-network-binding.md` documents the HTTP
+server binding fix — use `0.0.0.0` instead of `127.0.0.1` to expose services
+from Docker-in-WSL2 to the Windows host browser."

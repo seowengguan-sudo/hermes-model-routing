@@ -69,8 +69,15 @@ If the user reports ALL sessions vanished from the Hermes dashboard:
 - **Pre-commit hook blocks** any staged `state.db*` or `*.db` file — catches the race
   BEFORE it's committed (the zeroed-DB guard fires too late at open time).
 - **State snapshots:** `hermes backup --quick` saves to `/opt/data/state-snapshots/`.
+- **Diagnostic variant (Aug 13):** If `state.db` is NOT zeroed but the chat panel shows
+  only cron sessions, check `SELECT source, COUNT(*) FROM sessions GROUP BY source`. A
+  result with only `cron` rows (and at most 1 `tui` row for the current session) means TUI
+  history was lost before the snapshot was taken — WAL-from-git and snapshot restore won't
+  help. See `references/state-db-recovery.md` → "Variant: state.db valid but missing ALL
+  TUI sessions" for the full diagnostic + prevention.
 - See also `references/state-db-recovery.md` and the `hermes-cron-model-pinning` skill
   (Pitfall #15 for full incident details).
+- `references/investigate-unknown-binary.md` — workflow for identifying an unknown on-disk binary (ELF vs script, vendor via `strings`, audit-log verdicts, and whether it's actually active vs merely present).
 
 ## References
 - `references/introspection-landmarks.md` — verified paths, key files, the 6 MCP catalog entries, free-tier model list, context lengths.

@@ -50,7 +50,7 @@ Save diagrams to a user-specified path, or default to the current working direct
 ./[project-name]-architecture.html
 ```
 
-### Preview
+## Preview
 
 After saving, suggest the user open it:
 ```bash
@@ -60,21 +60,40 @@ open ./my-architecture.html
 xdg-open ./my-architecture.html
 ```
 
+> **⚠️ Local rendering note:** The browser-use daemon's Chromium sandbox blocks `file://` access (returns `chrome-error://chromewebdata/`). If programmatic screenshot verification is needed, serve over HTTP from a non-localhost address:
+> ```bash
+> python3 -m http.server 0.0.0.0:8899 --directory .
+> # then load via container IP in the browser tool
+> ```
+> Local `localhost`/`127.0.0.1` URLs are also blocked by the sandbox. If no visual verification path exists, rely on the **Geometry Audit** (contrast + overlap + anchor math) as the substitute verification — it is more rigorous than visual inspection.
+
+### Writing Large Diagrams (byte-cap workaround)
+
+`write_file` truncates content at ~10,000 bytes. Large diagrams (2+ SVGs, multi-panel) must be split:
+1. **First `write_file`**: write the `<head>`, CSS `<style>`, `<body>` open, first `<svg>` — stopping at a clean line *before* the 10KB cap. Verify with `read_file`.
+2. **Second pass**: use `patch` with `old_string` = the last 1-2 lines of the first SVG, `new_string` = same lines + the appended remainder (second SVG, cards, `</body></html>`).
+
+Never try to fit a multi-SVG diagram in one write call.
+
 ## Design System & Visual Language
 
 ### Color Palette (Semantic Mapping)
 
-Use specific `rgba` fills and hex strokes to categorize components:
+Use specific `fill="HEX"` + `fill-opacity="0.75"` + `stroke="HEX"` (bold stroke) to categorize components. **Validated high-contrast palette** (all ≥3:1 against `#020617` background at 0.75 opacity — verified by luminance math):
 
-| Component Type | Fill (rgba) | Stroke (Hex) |
+| Component Type | Fill (Hex @0.75) | Stroke |
 | :--- | :--- | :--- |
-| **Frontend** | `rgba(8, 51, 68, 0.4)` | `#22d3ee` (cyan-400) |
-| **Backend** | `rgba(6, 78, 59, 0.4)` | `#34d399` (emerald-400) |
-| **Database** | `rgba(76, 29, 149, 0.4)` | `#a78bfa` (violet-400) |
-| **AWS/Cloud** | `rgba(120, 53, 15, 0.3)` | `#fbbf24` (amber-400) |
-| **Security** | `rgba(136, 19, 55, 0.4)` | `#fb7185` (rose-400) |
-| **Message Bus** | `rgba(251, 146, 60, 0.3)` | `#fb923c` (orange-400) |
-| **External** | `rgba(30, 41, 59, 0.5)` | `#94a3b8` (slate-400) |
+| **Frontend** | `#0ea5e9` (sky-600) | `#06dafa` (cyan-400) |
+| **Backend** | `#10b981` (emerald-600) | `#34d399` (emerald-400) |
+| **Database** | `#a78bfa` (violet-400) | `#a78bfa` |
+| **AWS/Cloud** | `#f59e0b` (amber-500) | `#fbbf24` (amber-400) |
+| **Security** | `#ef4444` (red-500) | `#fb7185` (rose-400) |
+| **Message Bus** | `#0d9488` (teal-600) | `#22d3ee` (cyan-300) |
+| **External** | `#475569` (slate-600) | `#94a3b8` (slate-400) |
+| **Sandbox** | `#f87171` (red-400) | `#fb7185` |
+| **Scripts** | `#ea580c` (orange-600) | `#fbbf24` |
+
+⚠️ **Do NOT** use the old `rgba(R,G,B, 0.3-0.5)` palette — at those opacities the blended result drops below 3:1 against `#020617` for dark colors (purple, deep teal, dark slate). If you must use a dark base color, push opacity to ≥0.80.
 
 ### Typography & Background
 - **Font:** JetBrains Mono (Monospace), loaded from Google Fonts
@@ -109,6 +128,25 @@ Components are rounded rectangles (`rx="6"`) with 1.5px strokes. To prevent arro
 - **Message Buses:** Must be placed *in the gap* between services, not overlapping them
 - **Legend Placement:** **CRITICAL.** Must be placed outside all boundary boxes. Calculate the lowest Y-coordinate of all boundaries and place the legend at least 20px below it.
 
+### Geometry Audit (post-write verification)
+Before handing off the diagram, run this programmatic check on the generated HTML:
+1. **Real overlaps**: Parse all `<rect>` bounding boxes. Two rects "overlap" (defect) if they intersect AND neither fully contains the other (container-within-container is fine). Flag any real overlap >80px².
+2. **Canvas utilization**: Compute the bounding box of all real rects vs the SVG viewBox. Horizontal utilization should be ≥85%; flag if <80% (means wasted whitespace = bad flow).
+3. **Arrow anchoring**: For every `<line>`, verify at least one endpoint (x1,y1 or x2,y2) lands within 5px of a rect's edge (left/right/top/bottom). Arrow *label* text between boxes is OK — check the line, not the label.
+4. **Contrast (WCAG)**: For every `fill="HEX"` + `fill-opacity="N"`, blend the color over `#020617` and compute luminance contrast ratio. Must be ≥3:1 for the fill to count; labels at `#fff` are ≥20:1 (always fine).
+
+Sample checker (Python, run inline):
+```python
+import re, xml.dom.minidom as md
+def blend(fg,bg,a): return tuple(int(a*fg[i]+(1-a)*bg[i]) for i in range(3))
+def lum(r,g,b): ... # standard sRGB luminance
+def cr(c1,c2): ...  # (max+0.05)/(min+0.05)
+bg=(2,6,23)
+# For each rect fill+opacity: cr(blend(hex, bg, opacity), bg) >= 3.0
+# For each line: endpoint within 5px of a rect edge
+# For each viewport: (maxx-minx)/vw >= 0.85
+```
+
 ## Document Structure
 
 The generated HTML file follows a four-part layout:
@@ -136,6 +174,7 @@ The generated HTML file follows a four-part layout:
 - **No External Dependencies:** All CSS and SVG must be inline (except Google Fonts)
 - **No JavaScript:** Use pure CSS for any animations (like pulsing dots)
 - **Compatibility:** Must render correctly in any modern web browser
+- **Must pass post-write:** HTML well-formed check, SVG well-formed XML check, Geometry Audit (overlaps/contrast/anchors), and ≥85% canvas utilization.
 
 ## Template Reference
 

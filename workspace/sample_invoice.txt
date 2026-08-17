@@ -1,0 +1,14 @@
+Client: Acme Corporation
+Contact Person: John Smith
+SSN: 123-45-6789
+Credit Card: 4111-1111-1111-1111
+Email: billing@acme.com
+Phone: 555-123-4567
+Bank Account: 1234567890
+Address: 456 Oak Street, San Francisco, CA 94102
+API Key: sk-abc123def456ghi789jkl012mno345pqr
+Date: 2026-08-14
+Invoice #: INV-2026-001
+Amount: 50000.00 USD
+Notes: Project B phase C completed. Client A satisfied.
+Custom Code: XYZ-789

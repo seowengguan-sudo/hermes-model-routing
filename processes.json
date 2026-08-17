@@ -1,0 +1,24 @@
+[
+  {
+    "session_id": "proc_a094a72cab6a",
+    "command": "python3 /opt/data/projects/doc_reader/doc_reader_onefile.py",
+    "pid": 36701,
+    "pid_scope": "host",
+    "host_start_time": 9233780,
+    "systemd_unit": "",
+    "cwd": "/opt/data/projects/doc_reader",
+    "started_at": 1786929785.669598,
+    "task_id": "default",
+    "session_key": "20260813_230130_d5aa35",
+    "watcher_platform": "",
+    "watcher_chat_id": "",
+    "watcher_user_id": "",
+    "watcher_user_name": "",
+    "watcher_thread_id": "",
+    "watcher_message_id": "",
+    "watcher_interval": 0,
+    "parent_session_id": "",
+    "notify_on_complete": false,
+    "watch_patterns": []
+  }
+]

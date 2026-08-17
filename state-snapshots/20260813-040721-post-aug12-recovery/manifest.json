@@ -1,0 +1,23 @@
+{
+  "id": "20260813-040721-post-aug12-recovery",
+  "timestamp": "20260813-040721",
+  "label": "post-aug12-recovery",
+  "file_count": 12,
+  "total_size": 2131264,
+  "files": {
+    "state.db": 1921024,
+    "config.yaml": 1987,
+    ".env": 507,
+    "auth.json": 12227,
+    "cron/jobs.json": 10825,
+    "cron/executions.db": 28672,
+    "gateway_state.json": 305,
+    "channel_directory.json": 67,
+    "processes.json": 2,
+    "projects.db": 4096,
+    "verification_evidence.db": 32768,
+    "kanban.db": 118784
+  },
+  "failed_dbs": [],
+  "oversized_skipped": []
+}

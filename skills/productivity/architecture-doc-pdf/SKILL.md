@@ -46,6 +46,28 @@ When the user asks "how does Hermes work / how does a request flow," they mean t
 - **Keep designed/future architectures in a SEPARATE, clearly-labeled doc** (e.g. "v3.6 proposed spec"). Never present a design as the running system. State the residual honestly: "this is the verified contract; the runtime is not built."
 - If the user explicitly says "set the design aside / explain the real agent," drop all speculative material for that answer.
 
+## Critical pitfall #4.5 — KeepTogether misuse causes content to disappear or overlap
+
+When wrapping table-heavy sections that span pages, wrapping in a `KeepTogether([])`
+list can cause ReportLab to overflow frames silently if the content is too large for
+the remaining space. This was observed when building the MVP table in the OAKAI
+Mission Executive PDF.
+
+**Fix:** For tables that are long but not critical to keep together, wrap the *table*
+in KeepTogether but let section headers break naturally. For short tables (< 8 rows),
+always wrap in KeepTogether. For longer content, use `NextPageTemplate` + `PageBreak`
+before the table instead of relying on KeepTogether.
+
+```python
+# ❌ DON'T: large table in KeepTogether (overflow risk)
+story.append(KeepTogether([section_header(...), status_table(big_rows, ...)]))
+
+# ✅ DO: separate section header from long table
+story += section_header("03", "Business Model", "...")
+story.append(PageBreak())  # ensure table starts clean
+story.append(KeepTogether([status_table(medium_rows, ...)]))  # 4-8 rows = safe
+```
+
 ## Critical pitfall #4 — NO HOLISTIC OVERVIEW; TOO MANY GRANULAR DIAGRAMS
 Users find a pile of narrow diagrams (topology, chain, gate, 20-step loop, feedback…) HARDER to grasp than ONE coherent whole-system view. When documenting a whole architecture:
 - **Lead with ONE master/holistic diagram** that shows the entire system at a glance (user → intake → core → state → specialists/models → feedback loops), then drill into granular diagrams/tables afterward.
@@ -68,6 +90,8 @@ Users find a pile of narrow diagrams (topology, chain, gate, 20-step loop, feedb
 - references/flowchart_diagram.md — FlowChart Flowable for control-loop / process diagrams.
 - references/high_contrast_palette.md — saturated fills, dark strokes, dark caption text; the palette to use (replaces pastel tints a user rejected).
 - references/holistic_overview.md — master/whole-system diagram: A3 direct-canvas build + embed as cover.
+- references/two_tier_pdf_strategy.md — decision framework for choosing OAKAI template engine vs stdlib writer.
+- references/verification_pitfalls.md — critical pitfalls: KeepTogether overflow, ReportLab version diffs, PDF header assertion bugs, lazy-packages path, ad-hoc verification pattern.
 
 ## Overlap note for the curator
 This class of work also touches `pdf` (reportlab create), `documentation-generation` (stdlib PDF), and `architecture-diagram` (SVG/HTML, protected). Those are either protected (bundled) or method-mismatched (stdlib). This skill captures the verified reportlab+Platypus+diagram path. Consider consolidating the reportlab-creation guidance here vs `pdf`.

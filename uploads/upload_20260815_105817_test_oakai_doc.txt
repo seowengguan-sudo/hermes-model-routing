@@ -1,0 +1,8 @@
+OAKAI CONFIDENTIAL
+Client: Acme Corp
+SSN: 987-65-4321
+Credit Card: 5500-0000-0000-0004
+Email: contact@acme.com
+Phone: 555-123-4567
+API Key: sk_prod_5123456789abcdef0123456789abcdef
+Bank: Account 1234567890

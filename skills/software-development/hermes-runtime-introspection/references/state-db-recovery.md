@@ -56,3 +56,42 @@ Commit 54c4651 ("Initial sync after GitHub repo creation") has the full 11,779-f
 
 ### Key lesson: .gitignore and state.db
 The `.gitignore` in commit 450adc2 added `state.db*` as excluded, but the WAL file was accidentally committed in `c2e637c`. The `.gitignore` change went uncommitted until 450adc2. Always check git for WAL recovery when state.db shows 0 rows.
+
+### Variant: state.db valid but missing ALL TUI (non-cron) sessions
+**Seen 2026-08-13:** User reports the chat panel showing only cron automation sessions — no
+earlier human-initiated (TUI) chats. The live `state.db` is NOT zeroed (it's the full ~2MB
+SQLite file with a valid header) but its `sessions` table contains **only `source='cron'` rows**
+plus possibly one current `source='tui'` row for the *just-opened* session.
+
+**Root cause:** the TUI sessions were lost *before* the post-incident snapshot was taken. The
+snapshot at `state-snapshots/20260813-040721-post-aug12-recovery/` — named "post-recovery" —
+already contains only cron sessions (5 of them). This means the recovery itself did NOT
+restore TUI sessions; the TUI history was already gone prior to 04:07. WAL-from-git and
+snapshot restore will NOT recover TUI chats in this variant because those sessions never made
+it into either the snapshot or the committed WAL.
+
+**Diagnostic (run BEFORE assuming zeroed-DB):**
+```bash
+python3 -c "
+import sqlite3
+conn=sqlite3.connect('/opt/data/state.db')
+c=conn.cursor()
+c.execute('SELECT source, COUNT(*) FROM sessions GROUP BY source')
+print(dict(c.fetchall()))
+# Expected: {'cron': N, 'tui': M} — if 'tui' is absent or only =1 (current session),
+# the earlier human chats are lost from state.db.
+conn.close()
+"
+```
+
+**Recovery in this variant:** No automated DB recovery exists — the TUI session transcripts were
+not written to any snapshot or git-committed WAL. Recovery depends on whether:
+1. The current `state.db-wal` file on disk still has uncommitted TUI session pages (check
+   `ls -la state.db-wal` — if it's 0 bytes or absent, nothing is pending).
+2. The user has an external transcript/log of the lost chat (Hermes TUI does not auto-save
+   raw transcripts to disk by default).
+
+**Prevention:** set up `hermes backup --quick` on a **shorter** interval (e.g. every 4h via cron,
+not just post-incident) so at least one recent snapshot preserves TUI sessions. See
+`hermes-cron-model-pinning` Pitfall #15 for the state.db git-race root-cause prevention already in place
+(pre-commit hook + `.gitignore`).
